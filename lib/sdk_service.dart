@@ -100,7 +100,7 @@ class SdkService {
   SparkConfig _customSparkConfig() {
     return SparkConfig(
       coordinatorIdentifier:
-          '0000000000000000000000000000000000000000000000000000000000000000',
+          '0000000000000000000000000000000000000000000000000000000000000001',
       threshold: 2,
       signingOperators: _customOperators(),
       sspConfig: _customSspConfig(),
