@@ -1,5 +1,6 @@
 import 'package:breez_sdk_spark_flutter/breez_sdk_spark.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../sdk_service.dart';
 import 'history_screen.dart';
 import 'receive_screen.dart';
@@ -17,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GetInfoResponse? _info;
   List<Payment> _recentPayments = [];
   bool _loading = true;
+  bool _showUsd = false;
 
   @override
   void initState() {
@@ -48,17 +50,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final n = sats.toInt();
     if (n >= 1000000) return '${(n / 1000000).toStringAsFixed(2)}M';
     if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
-    return n.toString();
+    final f = NumberFormat('#,###');
+    return f.format(n);
   }
 
   String _formatToken(BigInt? balance, int decimals) {
     if (balance == null) return '0';
     final val = balance.toInt();
     final divisor = BigInt.from(10).pow(decimals).toInt();
-    if (val >= divisor) {
-      return '${(val / divisor).toStringAsFixed(2)}';
-    }
-    return '0.${val.toString().padLeft(decimals, '0')}';
+    final formatted = (val / divisor).toStringAsFixed(2);
+    final f = NumberFormat('#,##0.00');
+    return f.format(double.parse(formatted));
   }
 
   @override
@@ -66,10 +68,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final theme = Theme.of(context);
     final sats = _info?.balanceSats ?? BigInt.zero;
     final tokenBalances = _info?.tokenBalances ?? {};
+    final firstToken = tokenBalances.entries.isNotEmpty ? tokenBalances.entries.first : null;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('PEGGASUSD'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -80,53 +84,66 @@ class _HomeScreenState extends State<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: _loadData,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           children: [
-            // SAT Balance Card
-            Card(
-              color: theme.colorScheme.primaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    const Text('Bitcoin Balance',
-                        style: TextStyle(fontSize: 14)),
-                    const SizedBox(height: 8),
-                    Text('${_formatSats(sats)} SAT',
-                        style: theme.textTheme.headlineMedium
-                            ?.copyWith(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
 
-            // Token Balances
-            ...tokenBalances.entries.map((entry) {
-              final meta = entry.value.tokenMetadata;
-              final ticker = meta?.ticker ?? entry.key;
-              final decimals = meta?.decimals ?? 0;
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+            // Balance card - tap to toggle SAT/USD
+            GestureDetector(
+              onTap: () => setState(() => _showUsd = !_showUsd),
+              child: Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
                   child: Column(
                     children: [
-                      Text('$ticker Balance',
-                          style: const TextStyle(fontSize: 14)),
-                      const SizedBox(height: 8),
                       Text(
-                        _formatToken(entry.value.balance, decimals),
-                        style: theme.textTheme.headlineMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        _showUsd ? 'USD Balance' : 'Bitcoin Balance',
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 12),
+                      if (_showUsd && firstToken != null) ...[
+                        Text(
+                          _formatToken(
+                              firstToken.value.balance,
+                              firstToken.value.tokenMetadata?.decimals ?? 0),
+                          style: theme.textTheme.headlineLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          firstToken.value.tokenMetadata?.ticker ?? 'USD',
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      ] else ...[
+                        Text(
+                          '${_formatSats(sats)}',
+                          style: theme.textTheme.headlineLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const Text('sats',
+                            style: TextStyle(
+                                fontSize: 16, color: Colors.grey)),
+                      ],
+                      const SizedBox(height: 4),
+                      Text(
+                        'tap to switch',
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: Colors.grey[400]),
                       ),
                     ],
                   ),
                 ),
-              );
-            }),
-            const SizedBox(height: 16),
+              ),
+            ),
 
-            // Send / Receive Buttons
+            const SizedBox(height: 24),
+
+            // Send / Receive buttons
             Row(
               children: [
                 Expanded(
@@ -142,6 +159,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ),
@@ -159,20 +178,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.secondary,
                         foregroundColor: theme.colorScheme.onSecondary,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
 
-            // Recent Payments
+            const SizedBox(height: 32),
+
+            // Recent payments header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Recent Payments',
-                    style: theme.textTheme.titleMedium),
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
                 TextButton(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute(
@@ -182,31 +205,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            ..._recentPayments.map((p) => _PaymentTile(payment: p)),
+
+            if (_recentPayments.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32),
+                child: Center(
+                  child: Text('No payments yet',
+                      style: TextStyle(color: Colors.grey)),
+                ),
+              )
+            else
+              ..._recentPayments.map((p) => _PaymentTile(payment: p)),
           ],
         ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 1,
-        destinations: const [
-          NavigationDestination(
-              icon: Icon(Icons.swap_horiz), label: 'Swap'),
-          NavigationDestination(
-              icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(
-              icon: Icon(Icons.history), label: 'History'),
-        ],
-        onDestinationSelected: (i) {
-          if (i == 0) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SwapScreen()),
-            );
-          } else if (i == 2) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
-            );
-          }
-        },
       ),
     );
   }
@@ -223,8 +234,13 @@ class _PaymentTile extends StatelessWidget {
     final color = isSend ? Colors.red : Colors.green;
     final amount = payment.amount;
     final status = payment.status;
+    final isCompleted = status == PaymentStatus.completed;
+    final isPending = status == PaymentStatus.pending;
+    final statusColor =
+        isCompleted ? Colors.green : isPending ? Colors.orange : Colors.red;
 
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       leading: CircleAvatar(
         backgroundColor: color.withValues(alpha: 0.15),
         child: Icon(icon, color: color, size: 20),
@@ -232,35 +248,17 @@ class _PaymentTile extends StatelessWidget {
       title: Text(isSend ? 'Sent' : 'Received',
           style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: Text(
-        status == PaymentStatus.completed
-            ? 'Completed'
-            : status == PaymentStatus.pending
-                ? 'Pending'
-                : 'Failed',
+        isCompleted ? 'Completed' : isPending ? 'Pending' : 'Failed',
+        style: TextStyle(color: statusColor, fontSize: 13),
+      ),
+      trailing: Text(
+        '$amount SAT',
         style: TextStyle(
-          color: status == PaymentStatus.completed
-              ? Colors.green
-              : status == PaymentStatus.pending
-                  ? Colors.orange
-                  : Colors.red,
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+          color: color,
         ),
       ),
-      trailing: Text('$amount SAT',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: color,
-          )),
-    );
-  }
-}
-
-class SwapScreen extends StatelessWidget {
-  const SwapScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Swap SAT ↔ USD')),
-      body: const Center(child: Text('Coming soon')),
     );
   }
 }
