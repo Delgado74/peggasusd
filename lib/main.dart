@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'app_config.dart';
 import 'screens/home_screen.dart';
 import 'screens/onboard_screen.dart';
 import 'sdk_service.dart';
@@ -45,9 +46,25 @@ class _StartupScreenState extends State<StartupScreen> {
   }
 
   Future<void> _checkWallet() async {
-    final hasWallet = await SdkService.instance.hasStoredMnemonic();
+    final sdk = SdkService.instance;
+    final hasWallet = await sdk.hasStoredMnemonic();
     if (!mounted) return;
+
     if (hasWallet) {
+      final mnemonic = await sdk.loadMnemonic();
+      final apiKey = AppConfig.hasApiKey
+          ? AppConfig.breezApiKey
+          : await sdk.loadApiKey();
+
+      if (mnemonic != null && apiKey != null) {
+        try {
+          await sdk.init(mnemonic: mnemonic, apiKey: apiKey);
+        } catch (_) {
+          // init failed, show onboard screen to retry
+        }
+      }
+
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
