@@ -126,6 +126,19 @@ class SdkService {
     _initialized = false;
   }
 
+  // ─── Onchain Bitcoin receive ────────────────────────────────────────────────
+
+  Future<String> receiveBitcoinAddress({bool newAddress = false}) async {
+    final request = ReceivePaymentRequest(
+      paymentMethod: ReceivePaymentMethod.bitcoinAddress(
+        newAddress: newAddress,
+      ),
+    );
+    final response = await _sdk!.receivePayment(request: request);
+    await refreshInfo();
+    return response.paymentRequest;
+  }
+
   // ─── Lightning / SAT receive ──────────────────────────────────────────────
 
   Future<String> receiveLightningInvoice({

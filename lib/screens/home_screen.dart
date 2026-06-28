@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GetInfoResponse? _info;
   List<Payment> _recentPayments = [];
   bool _showUsd = false;
+  bool _usdInfoShown = false;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -75,6 +76,80 @@ class _HomeScreenState extends State<HomeScreen> {
     _scaffoldKey.currentState?.openDrawer();
   }
 
+  void _toggleBalance() {
+    final showUsd = !_showUsd;
+    if (showUsd && !_usdInfoShown) {
+      _usdInfoShown = true;
+      _showUsdInfoDialog();
+    } else {
+      setState(() => _showUsd = showUsd);
+    }
+  }
+
+  void _showUsdInfoDialog() {
+    final theme = Theme.of(context);
+    final ticker = _info?.tokenBalances.values.firstOrNull
+        ?.tokenMetadata.ticker ?? 'USD';
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Saldo en USD'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.currency_exchange,
+                    color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text('$ticker (Spark Token)',
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Tu saldo en USD está respaldado por Spark Tokens, '
+              'una moneda estable con paridad 1:1 con el dólar.',
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.info_outline,
+                    size: 18, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Montos menores a 1 $ticker se acumulan '
+                    'automáticamente hasta completar la unidad.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              setState(() => _showUsd = true);
+            },
+            child: const Text('Entendido'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -108,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
             // Balance card - tap to toggle SAT/USD
             GestureDetector(
-              onTap: () => setState(() => _showUsd = !_showUsd),
+              onTap: () => _toggleBalance(),
               child: Card(
                 elevation: 0,
                 color: theme.colorScheme.surfaceContainerHighest,
@@ -128,13 +203,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 12),
                       if (_showUsd && firstToken != null) ...[
-                        Text(
-                          _formatToken(
-                            firstToken.value.balance,
-                            firstToken.value.tokenMetadata.decimals,
-                          ),
-                          style: theme.textTheme.headlineLarge
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text('\$',
+                                  style: theme.textTheme.headlineMedium
+                                      ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: theme
+                                              .colorScheme.onSurfaceVariant)),
+                            ),
+                            Text(
+                              _formatToken(
+                                firstToken.value.balance,
+                                firstToken.value.tokenMetadata.decimals,
+                              ),
+                              style: theme.textTheme.headlineLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
                         Text(
                           firstToken.value.tokenMetadata.ticker,
