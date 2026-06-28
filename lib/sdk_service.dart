@@ -65,7 +65,7 @@ class SdkService {
     required String mnemonic,
     required String apiKey,
     String? storageDirPath,
-    bool customOperators = true,
+    bool customOperators = false,
   }) async {
     if (_initialized) return;
 

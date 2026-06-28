@@ -21,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   GetInfoResponse? _info;
   List<Payment> _recentPayments = [];
   bool _showUsd = false;
-  bool _usdInfoShown = false;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -58,8 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return f.format(n);
   }
 
-  String _formatToken(BigInt? balance, int decimals) {
-    if (balance == null) return '0';
+  String _formatToken(BigInt? balance, int? decimals) {
+    if (balance == null || decimals == null) return '0.00';
     final val = balance.toInt();
     final divisor = BigInt.from(10).pow(decimals).toInt();
     final formatted = (val / divisor).toStringAsFixed(2);
@@ -78,76 +77,109 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _toggleBalance() {
     final showUsd = !_showUsd;
-    if (showUsd && !_usdInfoShown) {
-      _usdInfoShown = true;
-      _showUsdInfoDialog();
-    } else {
-      setState(() => _showUsd = showUsd);
-    }
+    _showToggleDialog(showUsd);
   }
 
-  void _showUsdInfoDialog() {
+  void _showToggleDialog(bool toUsd) {
     final theme = Theme.of(context);
-    final ticker = _info?.tokenBalances.values.firstOrNull
-        ?.tokenMetadata.ticker ?? 'USD';
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Saldo en USD'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.currency_exchange,
-                    color: theme.colorScheme.primary),
-                const SizedBox(width: 8),
-                Text('$ticker (Spark Token)',
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Tu saldo en USD está respaldado por Spark Tokens, '
-              'una moneda estable con paridad 1:1 con el dólar.',
-              style: TextStyle(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontSize: 14,
+
+    if (toUsd) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Convert to USD'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your BTC balance will be converted to USD.',
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
               ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(Icons.info_outline,
-                    size: 18, color: theme.colorScheme.primary),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Montos menores a 1 $ticker se acumulan '
-                    'automáticamente hasta completar la unidad.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: theme.colorScheme.onSurfaceVariant,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 18, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Balance too low to convert - it will remain as change',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                setState(() => _showUsd = true);
+              },
+              child: const Text('Confirm'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              setState(() => _showUsd = true);
-            },
-            child: const Text('Entendido'),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Convert to BTC'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your USD balance will be converted back to BTC.',
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 18, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Balance too low to convert - it will remain as change',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                setState(() => _showUsd = false);
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -202,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                       ),
                       const SizedBox(height: 12),
-                      if (_showUsd && firstToken != null) ...[
+                      if (_showUsd) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,8 +250,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             Text(
                               _formatToken(
-                                firstToken.value.balance,
-                                firstToken.value.tokenMetadata.decimals,
+                                firstToken?.value.balance,
+                                firstToken?.value.tokenMetadata.decimals,
                               ),
                               style: theme.textTheme.headlineLarge
                                   ?.copyWith(fontWeight: FontWeight.bold),
@@ -227,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         Text(
-                          firstToken.value.tokenMetadata.ticker,
+                          firstToken?.value.tokenMetadata.ticker ?? 'USD',
                           style: theme.textTheme.titleMedium
                               ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                         ),
