@@ -37,7 +37,8 @@ jobs:
 
       - name: Build APK (arm64)
         run: |
-          flutter build apk --target-platform android-arm64 --release
+          flutter build apk --target-platform android-arm64 --release \
+            --dart-define=BREEZ_API_KEY=${{ secrets.BREEZ_API_KEY }}
           echo "=== Build output files ==="
           find build/app -name "*.apk" -type f
 

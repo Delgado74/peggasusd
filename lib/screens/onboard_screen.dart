@@ -1,5 +1,6 @@
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:flutter/material.dart';
+import '../app_config.dart';
 import '../sdk_service.dart';
 import 'home_screen.dart';
 
@@ -31,7 +32,9 @@ class _OnboardScreenState extends State<OnboardScreen> {
 
   Future<void> _submit() async {
     final mnemonic = _mnemonicController.text.trim();
-    final apiKey = _apiKeyController.text.trim();
+    final apiKey = AppConfig.hasApiKey
+        ? AppConfig.breezApiKey
+        : _apiKeyController.text.trim();
 
     if (mnemonic.isEmpty) {
       _showError('Enter or generate a mnemonic phrase');
@@ -129,13 +132,23 @@ class _OnboardScreenState extends State<OnboardScreen> {
               ),
             ],
             const SizedBox(height: 16),
-            TextField(
-              controller: _apiKeyController,
-              decoration: const InputDecoration(
-                labelText: 'Breez API Key',
-                border: OutlineInputBorder(),
+            if (AppConfig.hasApiKey)
+              const Card(
+                color: Colors.green,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Text('API key configured',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              )
+            else
+              TextField(
+                controller: _apiKeyController,
+                decoration: const InputDecoration(
+                  labelText: 'Breez API Key',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: _loading ? null : _submit,
