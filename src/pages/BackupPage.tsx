@@ -22,7 +22,6 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
   const isPasskey = isPasskeyMode();
 
   useEffect(() => {
-    if (isPasskey) return;
     let cancelled = false;
     (async () => {
       if (deviceOnlyStorage.isSupported() && (await deviceOnlyStorage.hasStoredSeed())) {
@@ -40,7 +39,10 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
         }
       }
       if (cancelled) return;
-      setMnemonic(localStorage.getItem('walletMnemonic'));
+      const local = localStorage.getItem('walletMnemonic');
+      if (local) {
+        setMnemonic(local);
+      }
     })();
     return () => {
       cancelled = true;
@@ -200,8 +202,8 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
             </button>
           )}
 
-          {/* Reveal button (mnemonic mode) */}
-          {!isPasskey && !isRevealed && mnemonic && (
+          {/* Reveal button (mnemonic available) */}
+          {!isRevealed && mnemonic && (
             <button
               onClick={() => setIsRevealed(true)}
               className="w-full bg-spark-dark border border-spark-border rounded-2xl p-8 flex flex-col items-center gap-4 hover:border-spark-border-light transition-colors"

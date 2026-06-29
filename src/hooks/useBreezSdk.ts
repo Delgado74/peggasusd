@@ -459,9 +459,6 @@ export function useBreezSdk(
           } catch {
             // non-fatal; storage layer logged.
           }
-        } else if (passkeyLabel != null) {
-          // Web passkey mode: never cache the PRF-derived seed.
-          clearMnemonic();
         } else if (seed.type === 'mnemonic') {
           saveMnemonic(seed.mnemonic);
         }
@@ -740,28 +737,19 @@ export function useBreezSdk(
     }
     retryUnlockInFlightRef.current = true;
     if (!secureStorage.isSupported()) {
-      if (!isPasskeyMode()) {
-        setStartupState('no-wallet');
-        retryUnlockInFlightRef.current = false;
-        return;
+      const saved = getSavedMnemonic();
+      if (saved) {
+        try {
+          setError(null);
+          await connectWallet({ type: 'mnemonic', mnemonic: saved }, false);
+          return;
+        } catch (e) {
+          logger.error(LogCategory.AUTH, 'Failed to reconnect with saved mnemonic', { error: formatError(e) });
+          clearMnemonic();
+        }
       }
-      setError(null);
-      flushSync(() => {
-        setStartupState('native-unlocking');
-        setIsLoading(true);
-      });
-      try {
-        const effectiveLabel = localStorage.getItem('passkeyLabel') ?? undefined;
-        const response = await signInPinnedToActiveCredential(effectiveLabel);
-        await connectWallet(response.wallet.seed, false, response.wallet.label);
-      } catch (e) {
-        logger.error(LogCategory.AUTH, 'Web passkey retry failed', { error: formatError(e) });
-        setError('Failed to authenticate with passkey. Please try again.');
-        setStartupState('native-locked');
-        setIsLoading(false);
-      } finally {
-        retryUnlockInFlightRef.current = false;
-      }
+      setStartupState('no-wallet');
+      retryUnlockInFlightRef.current = false;
       return;
     }
     setError(null);
@@ -985,11 +973,7 @@ export function useBreezSdk(
 
       // (E) Legacy flow: web, or native with no stored seed.
       if (useLegacy) {
-        if (isPasskeyMode()) {
-          // Passkey mode always re-derives via PRF on launch.
-          clearMnemonic();
-        }
-        const savedMnemonic = !isPasskeyMode() ? getSavedMnemonic() : null;
+        const savedMnemonic = getSavedMnemonic();
         if (savedMnemonic) {
           try {
             setIsLoading(true);

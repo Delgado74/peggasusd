@@ -512,7 +512,11 @@ class NativeSecureStorage implements SecureStorage {
   private inflightRetrieve: Promise<Seed> | null = null;
 
   isSupported(): boolean {
-    return true;
+    try {
+      return getNativeVault() !== null;
+    } catch {
+      return false;
+    }
   }
 
   async hasStoredSeed(): Promise<boolean> {
@@ -634,7 +638,11 @@ function decodeStoredSeedBlob(raw: string, operation: string): Seed {
  */
 class NativeDeviceOnlyStorage implements SecureStorage {
   isSupported(): boolean {
-    return true;
+    try {
+      return getNativeVault() !== null;
+    } catch {
+      return false;
+    }
   }
 
   async hasStoredSeed(): Promise<boolean> {
