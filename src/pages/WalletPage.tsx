@@ -31,7 +31,6 @@ interface WalletPageProps {
   onOpenGetRefund: (source?: 'menu' | 'icon') => void;
   onOpenSettings: () => void;
   onOpenBackup: () => void;
-  network?: Network;
   onDepositChanged?: () => void;
 }
 
