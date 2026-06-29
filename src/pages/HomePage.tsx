@@ -39,7 +39,6 @@ const HomePage: React.FC<HomePageProps> = ({
   useStatusBarColor(STATUS_BAR_DARK);
 
   const [showMnemonicFlow, setShowMnemonicFlow] = useState(false);
-  const [starsAnimating, setStarsAnimating] = useState(false);
   // Tri-state: null while the capability probe is in-flight, then true
   // / false once `getClientCapabilities()` resolves. Default is `null`
   // (loading) so we don't flash the wrong button set on first paint.
@@ -48,11 +47,6 @@ const HomePage: React.FC<HomePageProps> = ({
   // mobile Safari and mobile Chrome without the experiment flag).
   const [immediateGetSupported, setImmediateGetSupported] = useState<boolean | null>(null);
   const { handleTap: handleLogoTap } = useSecretTap(5, 2000, false, () => setShowMnemonicFlow(v => !v));
-
-  useEffect(() => {
-    const timer = setTimeout(() => setStarsAnimating(true), 300);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -125,9 +119,8 @@ const HomePage: React.FC<HomePageProps> = ({
           {/* Icon container */}
           <GlowLogo
             sizePx={144}
-            starsAnimating={starsAnimating}
             onClick={handleLogoTap}
-            imgClassName="drop-shadow-[0_0_24px_rgba(212,165,116,0.45)]"
+            imgClassName="drop-shadow-[0_0_24px_rgba(247,147,26,0.45)]"
           />
         </div>
 

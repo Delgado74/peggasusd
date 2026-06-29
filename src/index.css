@@ -3,17 +3,25 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-spark-void: #0a0a0f;
-  --color-spark-dark: #0f0f18;
-  --color-spark-surface: #151520;
-  --color-spark-elevated: #1a1a28;
-  --color-spark-border: #252535;
-  --color-spark-border-light: #35354a;
+  --color-spark-void: #07090D;
+  --color-spark-dark: #10141B;
+  --color-spark-surface: #1A2027;
+  --color-spark-elevated: #232B33;
+  --color-spark-border: #2C3640;
+  --color-spark-border-light: #4B5A68;
   --color-spark-primary: var(--spark-primary);
   --color-spark-primary-light: var(--spark-primary-light);
   --color-spark-primary-glow: var(--glow-primary);
-  --color-spark-electric: #00d4ff;
-  --color-spark-electric-light: #7df3ff;
+  --color-spark-gold: var(--spark-gold);
+  --color-spark-gold-light: var(--spark-gold-light);
+  --color-spark-turquoise: var(--spark-turquoise);
+  --color-spark-turquoise-light: var(--spark-turquoise-light);
+  --color-spark-electric: #00C7B7;
+  --color-spark-electric-light: #24D4C5;
+
+  --font-display: Space Grotesk, system-ui, sans-serif;
+  --font-sans: Space Grotesk, system-ui, sans-serif;
+  --font-mono: JetBrains Mono, ui-monospace, monospace;
   --color-spark-success: #10b981;
   --color-spark-error: #ef4444;
   --color-spark-warning: var(--spark-primary);
@@ -50,12 +58,12 @@
   );
   --background-image-glow-electric: radial-gradient(
     ellipse at center,
-    rgba(0, 212, 255, 0.1) 0%,
+    rgba(0, 199, 183, 0.1) 0%,
     transparent 70%
   );
 
   --shadow-glow-primary: 0 0 40px var(--glow-primary);
-  --shadow-glow-electric: 0 0 40px rgba(0, 212, 255, 0.3);
+  --shadow-glow-electric: 0 0 40px var(--glow-turquoise);
   --shadow-glow-success: 0 0 30px rgba(16, 185, 129, 0.4);
   --shadow-glow-error: 0 0 30px rgba(239, 68, 68, 0.4);
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -136,37 +144,44 @@
 
 :root {
   /* ========================================
-     PRIMARY ACCENT - Change this one line!
+     PEGGASUSD BRAND COLORS
+     Dark Tech + Bitcoin (orange) + USD (turquoise)
      ======================================== */
-  --spark-primary: #d4a574;
-  /* Soft Gold - warm, elegant, premium */
-  --spark-primary-light: #e8c9a8;
-  --glow-primary: rgba(212, 165, 116, 0.35);
+  --spark-primary: #F7931A;
+  /* Bitcoin orange - primary brand color */
+  --spark-primary-light: #FFB52E;
+  --glow-primary: rgba(247, 147, 26, 0.35);
+
+  /* Gold accent (Bitcoin / Lightning) */
+  --spark-gold: #F7931A;
+  --spark-gold-light: #FFB52E;
+  --glow-gold: rgba(247, 147, 26, 0.35);
+
+  /* Turquoise (USD / Spark / stablecoins) */
+  --spark-turquoise: #00C7B7;
+  --spark-turquoise-light: #24D4C5;
+  --glow-turquoise: rgba(0, 199, 183, 0.35);
 
   /* Core colors */
-  --spark-void: #0a0a0f;
-  --spark-dark: #0f0f18;
-  --spark-surface: #151520;
-  --spark-elevated: #1a1a28;
-  --spark-border: #252535;
-  --spark-border-light: #35354a;
-
-  /* Secondary accents (for send/receive) */
-  --spark-electric: #00d4ff;
-  --spark-electric-light: #7df3ff;
+  --spark-void: #07090D;
+  --spark-dark: #10141B;
+  --spark-surface: #1A2027;
+  --spark-elevated: #232B33;
+  --spark-border: #2C3640;
+  --spark-border-light: #4B5A68;
 
   /* Semantic colors */
   --spark-success: #10b981;
   --spark-error: #ef4444;
-  --spark-warning: #d4a574;
+  --spark-warning: #F7931A;
 
   /* Text */
-  --spark-text-primary: #ffffff;
-  --spark-text-secondary: rgba(255, 255, 255, 0.7);
-  --spark-text-muted: rgba(255, 255, 255, 0.4);
+  --spark-text-primary: #F4F6F8;
+  --spark-text-secondary: rgba(244, 246, 248, 0.7);
+  --spark-text-muted: rgba(244, 246, 248, 0.4);
 
   /* Glows */
-  --glow-electric: rgba(0, 212, 255, 0.3);
+  --glow-electric: rgba(0, 199, 183, 0.3);
   --glow-success: rgba(16, 185, 129, 0.4);
   --glow-error: rgba(239, 68, 68, 0.4);
 }
@@ -193,7 +208,7 @@ body,
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
   background: var(--spark-void);
   color: var(--spark-text-primary);
   -webkit-font-smoothing: antialiased;
@@ -236,9 +251,9 @@ html.keyboard-visible .bottom-sheet-content-pad:focus-within {
 .main-wrapper {
   height: 100dvh;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.15), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(247, 147, 26, 0.08), transparent),
-    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(0, 212, 255, 0.06), transparent),
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(247, 147, 26, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(0, 199, 183, 0.10), transparent),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(247, 147, 26, 0.05), transparent),
     var(--spark-void);
   position: relative;
 }
@@ -285,13 +300,13 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: -0.025em;
 }
 
 .font-display {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
 }
 
 /* Balance display - large clean numbers with background glow */
@@ -310,7 +325,7 @@ h6 {
    ============================================ */
 
 .button {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
   font-weight: 600;
   padding: 0.75em 2em;
   border-radius: 0.75rem;
@@ -373,8 +388,7 @@ h6 {
   gap: 0.5rem;
   padding: 0.875rem 1rem;
   border-radius: 0.75rem;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-weight: 600;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
   font-size: 0.9375rem;
   letter-spacing: 0.01em;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -385,36 +399,36 @@ h6 {
 }
 
 .action-button-send {
-  background: linear-gradient(135deg, var(--spark-electric) 0%, #0099cc 100%);
+  background: linear-gradient(135deg, var(--spark-primary) 0%, #D88A15 100%);
   color: #000;
-  box-shadow: 0 2px 8px var(--glow-electric);
+  box-shadow: 0 2px 8px var(--glow-primary);
 }
 
 .action-button-send:hover {
-  box-shadow: 0 4px 16px var(--glow-electric);
+  box-shadow: 0 4px 16px var(--glow-primary);
   filter: brightness(1.05);
 }
 
 .action-button-send:active {
   transform: scale(0.97);
-  box-shadow: 0 2px 8px var(--glow-electric), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px var(--glow-primary), inset 0 1px 3px rgba(0, 0, 0, 0.2);
   transition: all 0.1s ease;
 }
 
 .action-button-receive {
-  background: linear-gradient(135deg, var(--spark-success) 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--spark-turquoise) 0%, #0F8E8D 100%);
   color: #000;
-  box-shadow: 0 2px 8px var(--glow-success);
+  box-shadow: 0 2px 8px var(--glow-turquoise);
 }
 
 .action-button-receive:hover {
-  box-shadow: 0 4px 16px var(--glow-success);
+  box-shadow: 0 4px 16px var(--glow-turquoise);
   filter: brightness(1.05);
 }
 
 .action-button-receive:active {
   transform: scale(0.97);
-  box-shadow: 0 2px 8px var(--glow-success), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px var(--glow-turquoise), inset 0 1px 3px rgba(0, 0, 0, 0.2);
   transition: all 0.1s ease;
 }
 
@@ -486,8 +500,8 @@ h6 {
 .qr-scanner-button:hover .qr-corner {
   width: 12px;
   height: 12px;
-  border-color: var(--spark-electric);
-  filter: drop-shadow(0 0 4px var(--spark-electric));
+  border-color: var(--spark-primary);
+  filter: drop-shadow(0 0 4px var(--spark-primary));
 }
 
 .qr-scanner-button:hover svg {
@@ -1200,7 +1214,7 @@ main {
 .sidebar-star {
   position: absolute;
   border-radius: 50%;
-  background: #d4af83;
+  background: #F7931A;
   pointer-events: none;
   opacity: 0;
 }

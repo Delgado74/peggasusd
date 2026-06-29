@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useWallet } from '../contexts/WalletContext';
 import { useToast } from '../contexts/ToastContext';
 import { logger, LogCategory } from '@/services/logger';
@@ -6,7 +6,6 @@ import CollapsingWalletHeader from '../components/CollapsingWalletHeader';
 import SideMenu from '../components/SideMenu';
 import TransactionList from '../components/TransactionList';
 import { GetInfoResponse, Payment, DepositInfo, Network } from '@breeztech/breez-sdk-spark';
-import type { BuyBitcoinProvider } from '../services/settings';
 import { ArrowUpIcon, QrCodeIcon, ArrowDownIcon } from '../components/Icons';
 import { mergeDepositsWithTransactions, ExtendedPayment, isUnclaimedDepositPayment } from '@/utils/depositHelpers';
 import SendPaymentDialog from '../features/send/SendPaymentDialog';
@@ -16,8 +15,6 @@ import PaymentDetailsDialog from '../components/PaymentDetailsDialog';
 import { useLatest } from '../hooks/useLatest';
 import UnclaimedDepositDetailsPage from './UnclaimedDepositDetailsPage';
 import SaveContactDialog from '../features/send/components/SaveContactDialog';
-import BuyBitcoinDialog from '../features/buy/BuyBitcoinDialog';
-import { getBuyProviderSettings, filterProvidersByNetwork } from '../services/settings';
 import { useStatusBarColor } from '../hooks/useStatusBarColor';
 import { STATUS_BAR_WALLET_GLASS } from '../utils/statusBarManager';
 
@@ -34,8 +31,6 @@ interface WalletPageProps {
   onOpenGetRefund: (source?: 'menu' | 'icon') => void;
   onOpenSettings: () => void;
   onOpenBackup: () => void;
-  onOpenBuyProviders: () => void;
-  onBuyBitcoin: (provider: BuyBitcoinProvider) => Promise<void>;
   network?: Network;
   onDepositChanged?: () => void;
 }
@@ -51,8 +46,6 @@ const WalletPage: React.FC<WalletPageProps> = ({
   onOpenGetRefund,
   onOpenSettings,
   onOpenBackup,
-  onOpenBuyProviders,
-  onBuyBitcoin,
   network,
   onDepositChanged,
 }) => {
@@ -75,18 +68,12 @@ const WalletPage: React.FC<WalletPageProps> = ({
   const [selectedDeposit, setSelectedDeposit] = useState<DepositInfo | null>(null);
   const [paymentInput, setPaymentInput] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isBuyBitcoinOpen, setIsBuyBitcoinOpen] = useState(false);
-  const [isBuyLoading, setIsBuyLoading] = useState(false);
-  // Re-read when menu closes (user may have changed providers in BuyProvidersPage)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const enabledBuyProviders = useMemo(() => filterProvidersByNetwork(getBuyProviderSettings(), network), [isMenuOpen, network]);
   const [saveContactAddress, setSaveContactAddress] = useState<string | null>(null);
   // Bump these on each open so each dialog remounts and lazy-inits its
   // state, instead of relying on a reset-in-effect inside the dialog.
   const [saveContactSession, setSaveContactSession] = useState(0);
   const [sendDialogSession, setSendDialogSession] = useState(0);
   const [receiveDialogSession, setReceiveDialogSession] = useState(0);
-  const [buyBitcoinSession, setBuyBitcoinSession] = useState(0);
 
   const openSendDialog = useCallback(() => {
     setSendDialogSession(s => s + 1);
@@ -95,10 +82,6 @@ const WalletPage: React.FC<WalletPageProps> = ({
   const openReceiveDialog = useCallback(() => {
     setReceiveDialogSession(s => s + 1);
     setIsReceiveDialogOpen(true);
-  }, []);
-  const openBuyBitcoinDialog = useCallback(() => {
-    setBuyBitcoinSession(s => s + 1);
-    setIsBuyBitcoinOpen(true);
   }, []);
 
   const transactionsContainerRef = useRef<HTMLDivElement>(null);
@@ -226,18 +209,6 @@ const WalletPage: React.FC<WalletPageProps> = ({
           walletInfo={walletInfo}
           scrollProgress={scrollProgress}
           onOpenMenu={() => setIsMenuOpen(true)}
-          onOpenBuyBitcoin={() => {
-            if (enabledBuyProviders.length === 0) {
-              onOpenBuyProviders();
-            } else if (enabledBuyProviders.length === 1 && enabledBuyProviders[0] === 'moonpay') {
-              // MoonPay can redirect directly; Cash App needs amount entry via the dialog.
-              setIsBuyLoading(true);
-              onBuyBitcoin(enabledBuyProviders[0]).finally(() => setIsBuyLoading(false));
-            } else {
-              openBuyBitcoinDialog();
-            }
-          }}
-          isBuyLoading={isBuyLoading}
           isSyncing={isSyncing}
           refreshWalletData={() => refreshWalletData(false)}
           hasRejectedDeposits={hasRejectedDeposits}
@@ -273,15 +244,6 @@ const WalletPage: React.FC<WalletPageProps> = ({
         key={`receive-${receiveDialogSession}`}
         isOpen={isReceiveDialogOpen}
         onClose={handleReceiveDialogClose}
-      />
-
-      {/* Buy Bitcoin Dialog */}
-      <BuyBitcoinDialog
-        key={`buy-${buyBitcoinSession}`}
-        isOpen={isBuyBitcoinOpen}
-        onClose={() => setIsBuyBitcoinOpen(false)}
-        onBuyBitcoin={onBuyBitcoin}
-        network={network}
       />
 
       {/* QR Scanner Dialog */}

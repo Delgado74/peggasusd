@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { Transition, TransitionChild } from '@headlessui/react';
 import { isPasskeyMode } from '@/services/passkeyService';
@@ -8,6 +8,7 @@ import { useStatusBarColor } from '../hooks/useStatusBarColor';
 import { STATUS_BAR_SURFACE, STATUS_BAR_DIALOG_SCRIM } from '../utils/statusBarManager';
 import { useBackButton } from '../hooks/useBackButton';
 import GlowLogo from './GlowLogo';
+import { locale, setLocale, t, type Locale } from '../services/locale';
 
 // External-store measurement of the content-root's left offset, used
 // to anchor the drawer panel to the centered max-w-4xl column.
@@ -86,19 +87,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
 
   const isPasskey = isPasskeyMode();
 
-  // Stars animate after the 300ms slide-in delay. Derived from isOpen
-  // so close flips it off immediately without a reset in an effect.
-  const [starsLit, setStarsLit] = useState(false);
-  const starsAnimating = isOpen && starsLit;
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const timer = setTimeout(() => setStarsLit(true), 300);
-    return () => {
-      clearTimeout(timer);
-      setStarsLit(false);
-    };
-  }, [isOpen]);
+  const [currentLocale, setCurrentLocale] = useState<Locale>(locale.get());
 
   // Close the drawer first, then fire the navigation callback once the
   // drawer's leave animation completes. Kept sequential (not
@@ -119,23 +108,23 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
     // Get Refund - only show when there are rejected deposits
     ...(hasRejectedDeposits && onOpenRefund ? [{
       icon: <RefundIcon />,
-      label: 'Get Refund',
+      label: t('getRefund'),
       onClick: () => closeDrawerThen(onOpenRefund),
       highlight: true
     }] : []),
     {
       icon: <BackupIcon />,
-      label: 'Backup',
+      label: t('backup'),
       onClick: () => closeDrawerThen(onOpenBackup)
     },
     {
       icon: <SettingsIcon />,
-      label: 'Settings',
+      label: t('settings'),
       onClick: () => closeDrawerThen(onOpenSettings)
     },
     {
       icon: <LogoutIcon />,
-      label: 'Logout',
+      label: t('logout'),
       onClick: () => { setShowLogoutConfirm(true); }
     }
   ];
@@ -185,8 +174,8 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
             {/* Header */}
             <div className="flex items-center justify-between mb-8 pt-6">
               <div className="flex items-center gap-2.5">
-                <GlowLogo sizePx={40} starsAnimating={starsAnimating} />
-                <h2 className="font-display text-xl font-bold text-spark-text-primary">Glow</h2>
+                <GlowLogo sizePx={40} />
+                <h2 className="font-display text-xl font-bold text-spark-text-primary">PEGGASUSD</h2>
               </div>
               <button
                 onClick={onClose}
@@ -216,14 +205,39 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
             </nav>
 
             {/* Footer */}
-            <div className="pt-6 pb-6 border-t border-spark-border">
+            <div className="pt-6 pb-6 border-t border-spark-border space-y-3">
+              {/* Language selector */}
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={() => { setLocale('es'); setCurrentLocale('es'); }}
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                    currentLocale === 'es'
+                      ? 'bg-spark-primary text-white'
+                      : 'text-spark-text-muted hover:text-spark-text-secondary border border-spark-border'
+                  }`}
+                >
+                  ES
+                </button>
+                <span className="text-spark-text-muted text-xs">|</span>
+                <button
+                  onClick={() => { setLocale('en'); setCurrentLocale('en'); }}
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+                    currentLocale === 'en'
+                      ? 'bg-spark-primary text-white'
+                      : 'text-spark-text-muted hover:text-spark-text-secondary border border-spark-border'
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
+
               <a
                 href="https://breez.technology/sdk/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-xs text-spark-text-muted text-center hover:text-spark-text-secondary transition-colors"
               >
-                Powered by Breez SDK
+                Desarrollado por Breez SDK
               </a>
             </div>
 
@@ -259,12 +273,10 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
                   </div>
 
                   <h3 className="font-display text-lg font-semibold text-spark-text-primary text-center mb-2">
-                    Logout Warning
+                    {t('logoutWarning')}
                   </h3>
                   <p className="text-spark-text-secondary text-sm text-center mb-6">
-                    {isPasskey
-                      ? "You'll need to authenticate with the same passkey to access your funds again."
-                      : "Make sure you've saved your recovery phrase before logging out. You'll need it to access your funds again."}
+                    {isPasskey ? t('logoutMessagePasskey') : t('logoutMessage')}
                   </p>
 
                   <div className="flex gap-3">
@@ -272,13 +284,13 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
                       onClick={() => setShowLogoutConfirm(false)}
                       className="flex-1 px-4 py-3 border border-spark-border text-spark-text-secondary rounded-xl font-medium hover:text-spark-text-primary hover:border-spark-border-light transition-colors"
                     >
-                      Cancel
+                      {t('cancel')}
                     </button>
                     <button
                       onClick={handleConfirmLogout}
                       className="flex-1 px-4 py-3 bg-spark-error text-white rounded-xl font-medium hover:bg-spark-error/90 transition-colors"
                     >
-                      Logout
+                      {t('logout')}
                     </button>
                   </div>
                 </TransitionChild>

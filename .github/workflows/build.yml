@@ -32,11 +32,64 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build APK (debug)
-        run: cd android && ./gradlew assembleDebug
+      - name: Decode keystore
+        run: echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > android/app/peggasusd.keystore
+
+      - name: Write signing config script
+        run: |
+          cat > /tmp/configure_signing.py << 'PYEOF'
+          import os, re
+
+          build_path = "android/app/build.gradle.kts"
+          with open(build_path) as f:
+              content = f.read()
+
+          signing_config = f'''
+      signingConfigs {{
+          create("release") {{
+              storeFile = file("{os.environ['KEYSTORE_PATH']}")
+              storePassword = System.getenv("STORE_PASSWORD")
+              keyAlias = System.getenv("KEY_ALIAS")
+              keyPassword = System.getenv("KEY_PASSWORD")
+          }}
+      }}
+  '''
+
+          content = re.sub(
+              r'(defaultConfig \{.*?\n    \})',
+              r'\1' + signing_config,
+              content,
+              flags=re.DOTALL,
+          )
+
+          content = re.sub(
+              r'(getByName\("release"\) \{)',
+              r'\1\n            signingConfig = signingConfigs.getByName("release")',
+              content,
+          )
+
+          with open(build_path, "w") as f:
+              f.write(content)
+          print("signing config injected")
+          PYEOF
+
+      - name: Configure release signing in build.gradle.kts
+        run: python3 /tmp/configure_signing.py
+        env:
+          KEYSTORE_PATH: android/app/peggasusd.keystore
+          STORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+
+      - name: Build APK (release)
+        run: cd android && ./gradlew assembleRelease
+        env:
+          STORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: peggasusd-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/release/*.apk

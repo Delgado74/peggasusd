@@ -1,48 +1,48 @@
 {
-  "name": "Glow",
-  "short_name": "Glow",
-  "description": "Lightning fast Bitcoin payments powered by Breez SDK",
+  "name": "PEGGASUSD",
+  "short_name": "PEGGASUSD",
+  "description": "Lightning fast Bitcoin and USD payments powered by Breez SDK",
   "start_url": "/",
   "id": "/",
   "display": "standalone",
-  "background_color": "#0a0a0f",
-  "theme_color": "#0a0a0f",
+  "background_color": "#07090D",
+  "theme_color": "#07090D",
   "orientation": "portrait-primary",
   "categories": ["finance", "utilities"],
   "icons": [
     {
-      "src": "/icons/Glow-icon-192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/Glow-icon-512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/Glow-icon-maskable-192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icons/Glow-icon-maskable-512.png",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/icons/Glow_favicon.png",
+      "src": "/icons/favicon.png",
       "sizes": "64x64",
       "type": "image/png"
     },
     {
-      "src": "/assets/Glow_Logo.svg",
+      "src": "/assets/PEGGASUSD_Logo.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     }
   ],

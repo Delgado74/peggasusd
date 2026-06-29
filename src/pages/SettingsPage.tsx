@@ -15,7 +15,6 @@ interface SettingsPageProps {
   onBack: () => void;
   config: Config | null;
   onOpenFiatCurrencies: () => void;
-  onOpenBuyProviders: () => void;
   onOpenPasskeySettings: () => void;
 }
 
@@ -23,7 +22,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
   onBack,
   config,
   onOpenFiatCurrencies,
-  onOpenBuyProviders,
   onOpenPasskeySettings,
 }) => {
   const wallet = useWallet();
@@ -207,17 +205,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                 <div className="flex items-center gap-3">
                   <CurrencyIcon size="md" />
                   <span>Fiat Currencies</span>
-                </div>
-                <ChevronRightIcon size="md" />
-              </button>
-              <button
-                className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:bg-white/5 transition-colors"
-                type="button"
-                onClick={onOpenBuyProviders}
-              >
-                <div className="flex items-center gap-3">
-                  <CurrencyIcon size="md" />
-                  <span>Buy Bitcoin Providers</span>
                 </div>
                 <ChevronRightIcon size="md" />
               </button>

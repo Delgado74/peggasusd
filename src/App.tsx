@@ -19,7 +19,6 @@ import BackupPage from './pages/BackupPage';
 import PasskeyPage from './pages/PasskeyPage';
 import SettingsPage from './pages/SettingsPage';
 import FiatCurrenciesPage from './pages/FiatCurrenciesPage';
-import BuyProvidersPage from './pages/BuyProvidersPage';
 import UnlockPage from './pages/UnlockPage';
 import UnlockingPage from './pages/UnlockingPage';
 // Dev-gated Passkey & Labels hub + the AAGUID lookup database it pulls
@@ -38,7 +37,7 @@ import { STATUS_BAR_LOADING } from './utils/statusBarManager';
 import { useBackButton } from './hooks/useBackButton';
 import type { Seed, Payment } from '@breeztech/breez-sdk-spark';
 
-type Screen = 'home' | 'restore' | 'generate' | 'wallet' | 'getRefund' | 'settings' | 'backup' | 'fiatCurrencies' | 'buyProviders' | 'passkey' | 'unlock' | 'unlocking' | 'passkeySettings' | 'passkeyManagement' | 'labels' | 'passkeyLocalState';
+type Screen = 'home' | 'restore' | 'generate' | 'wallet' | 'getRefund' | 'settings' | 'backup' | 'fiatCurrencies' | 'passkey' | 'unlock' | 'unlocking' | 'passkeySettings' | 'passkeyManagement' | 'labels' | 'passkeyLocalState';
 
 // Full-screen dim spinner shown while sdk.isLoading is true (logout in
 // progress, SDK reconnect, etc). Wrapped as its own component so the
@@ -70,7 +69,6 @@ const AppContent: React.FC = () => {
   // `currentScreen` below.
   const [userScreen, setUserScreen] = useState<Screen>('home');
   const [refundAnimationDirection, setRefundAnimationDirection] = useState<'left' | 'up'>('left');
-  const [buyProvidersSource, setBuyProvidersSource] = useState<'wallet' | 'settings'>('wallet');
   const [passkeySdkConnected, setPasskeySdkConnected] = useState(false);
   // True when the user entered the passkey screen via the explicit
   // "Create New Wallet" CTA on browsers without `immediateGet`. Skips
@@ -156,9 +154,6 @@ const AppContent: React.FC = () => {
       case 'passkeyLocalState':
         setUserScreen('passkeySettings');
         return true;
-      case 'buyProviders':
-        setUserScreen(buyProvidersSource === 'settings' ? 'settings' : 'wallet');
-        return true;
       case 'restore':
       case 'generate':
       case 'passkey':
@@ -176,7 +171,7 @@ const AppContent: React.FC = () => {
         // (same as pressing Home). Matches standard Android UX.
         return false;
     }
-  }, [currentScreen, buyProvidersSource]), true);
+  }, [currentScreen]), true);
 
   // Render screens
   const renderCurrentScreen = () => {
@@ -218,7 +213,7 @@ const AppContent: React.FC = () => {
 
     // Wallet-layer renderer. Used both as the `wallet` case itself and
     // as a backdrop beneath overlay SlideInPages (Settings / Backup /
-    // GetRefund / BuyProviders / FiatCurrencies) so their enter/leave
+    // GetRefund / FiatCurrencies) so their enter/leave
     // slide animations reveal the wallet underneath instead of empty
     // space. Before this, the underlying WalletPage popped in only
     // after the overlay's leave animation completed, which felt jumpy.
@@ -254,8 +249,6 @@ const AppContent: React.FC = () => {
           }}
           onOpenSettings={() => setUserScreen('settings')}
           onOpenBackup={() => setUserScreen('backup')}
-          onOpenBuyProviders={() => { setBuyProvidersSource('wallet'); setUserScreen('buyProviders'); }}
-          onBuyBitcoin={sdk.handleBuyBitcoin}
           network={sdk.config?.network}
           onDepositChanged={sdk.fetchUnclaimedDeposits}
         />
@@ -263,8 +256,8 @@ const AppContent: React.FC = () => {
     };
 
     // Settings-layer renderer. Used both as the `settings` case and as
-    // a backdrop beneath nested overlays (FiatCurrencies and
-    // BuyProviders when reached from Settings) so those close
+    // a backdrop beneath nested overlays (FiatCurrencies
+    // when reached from Settings) so those close
     // animations reveal Settings rather than skipping back to the
     // wallet directly.
     const renderSettingsPage = () => (
@@ -272,7 +265,6 @@ const AppContent: React.FC = () => {
         onBack={() => setUserScreen('wallet')}
         config={sdk.config}
         onOpenFiatCurrencies={() => setUserScreen('fiatCurrencies')}
-        onOpenBuyProviders={() => { setBuyProvidersSource('settings'); setUserScreen('buyProviders'); }}
         onOpenPasskeySettings={() => setUserScreen('passkeySettings')}
       />
     );
@@ -428,25 +420,6 @@ const AppContent: React.FC = () => {
               {renderPasskeySettingsPage()}
               <PasskeyLocalStatePage onBack={() => setUserScreen('passkeySettings')} onCompleted={handleLogout} />
             </Suspense>
-          </>
-        );
-
-      case 'buyProviders':
-        return (
-          <>
-            {renderWalletPage()}
-            {buyProvidersSource === 'settings' && renderSettingsPage()}
-            <BuyProvidersPage
-              onBack={() => setUserScreen(buyProvidersSource === 'settings' ? 'settings' : 'wallet')}
-              slideFrom={buyProvidersSource === 'settings' ? 'right' : 'up'}
-              // Wallet-sourced = modal-style presentation (slides up from
-              // the Buy button) → X close affordance in the header.
-              // Settings-sourced = drill-in nav (slides in from the
-              // right) → < back affordance. Matches iOS/Material
-              // conventions for modal vs. push navigation.
-              closeStyle={buyProvidersSource === 'settings' ? 'back' : 'close'}
-              network={sdk.config?.network}
-            />
           </>
         );
 

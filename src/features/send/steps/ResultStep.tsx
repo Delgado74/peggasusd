@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { PrimaryButton, ErrorMessageBox } from '../../../components/ui';
 import { CloseIcon } from '../../../components/Icons';
 import GlowLogo from '../../../components/GlowLogo';
@@ -13,14 +13,6 @@ export interface ResultStepProps {
 
 const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operationType = 'payment' }) => {
   const isSuccess = result === 'success';
-  const [starsAnimating, setStarsAnimating] = useState(false);
-
-  useEffect(() => {
-    if (isSuccess) {
-      const timer = setTimeout(() => setStarsAnimating(true), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isSuccess]);
 
   const getTitle = () => {
     if (operationType === 'auth') {
@@ -99,8 +91,7 @@ const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operati
         <div className="relative w-20 h-20 flex items-center justify-center">
           <GlowLogo
             sizePx={64}
-            starsAnimating={starsAnimating}
-            imgClassName="drop-shadow-[0_0_20px_rgba(212,165,116,0.5)]"
+            imgClassName="drop-shadow-[0_0_20px_rgba(247,147,26,0.5)]"
           />
         </div>
       </div>

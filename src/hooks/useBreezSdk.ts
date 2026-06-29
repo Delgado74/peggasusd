@@ -14,13 +14,11 @@ import { connect, initLogging } from '@breeztech/breez-sdk-spark';
 import { Capacitor } from '@capacitor/core';
 import type { PluginListenerHandle } from '@capacitor/core';
 import { App } from '@capacitor/app';
-import { Browser } from '@capacitor/browser';
 import { useLatest } from './useLatest';
 import { buildConnectConfig } from './buildConnectConfig';
 import { logger, LogCategory, logSdkMessage } from '../services/logger';
-import { formatError } from '../utils/formatError';
 import { isDepositRejected, clearRejectedDeposits } from '../services/depositState';
-import { setCachedStableTicker, clearNetworkOverride, clearStableRestorePrompted, type BuyBitcoinProvider } from '../services/settings';
+import { setCachedStableTicker, clearNetworkOverride, clearStableRestorePrompted } from '../services/settings';
 import { hideSplash } from '../main';
 import {
   isPrfAvailable,
@@ -176,7 +174,6 @@ export interface BreezSdkActions {
   refreshWalletData: (showLoading?: boolean) => Promise<void>;
   fetchUnclaimedDeposits: () => Promise<void>;
   handleLogout: () => Promise<void>;
-  handleBuyBitcoin: (provider: BuyBitcoinProvider) => Promise<void>;
   clearError: () => void;
   dismissCelebration: () => void;
   subscribeToSdkEvents: (handler: SdkEventHandler) => SdkEventUnsubscribe;
@@ -815,42 +812,6 @@ export function useBreezSdk(
     }
   }, [connectWallet]);
 
-  const handleBuyBitcoin = useCallback(async (provider: BuyBitcoinProvider) => {
-    if (!sdk) return;
-    // CashApp requires an amount and is driven by the BuyBitcoinDialog amount step
-    // (see useBuyBitcoin.generate), so this top-level handler only covers
-    // redirect-only providers like MoonPay.
-    if (provider === 'cashApp') return;
-
-    // On web, pre-open a blank tab synchronously during the user gesture
-    // so the popup blocker doesn't swallow it after the await. On native
-    // hosts we defer the URL open until after the SDK responds and hand
-    // it straight to @capacitor/browser (Chrome Custom Tabs on Android,
-    // SFSafariViewController on iOS), which opens the provider page
-    // completely outside the app's WebView (avoiding the earlier bug
-    // where setting window.location.href navigated the glow-web WebView
-    // to the provider URL and got stuck in a redirect loop when the
-    // user returned to the app).
-    const isNative = Capacitor.isNativePlatform();
-    const newTab = isNative ? null : window.open('', '_blank');
-
-    try {
-      const response = await sdk.buyBitcoin({ type: 'moonpay' });
-      if (isNative) {
-        await Browser.open({ url: response.url });
-      } else if (newTab) {
-        newTab.location.href = response.url;
-      } else {
-        window.location.href = response.url;
-      }
-    } catch (e) {
-      // Close the blank tab if the SDK call failed
-      newTab?.close();
-      logger.error(LogCategory.SDK, 'Failed to open Buy Bitcoin', { error: formatError(e) });
-      showToast('error', 'Buy Bitcoin', 'Failed to open purchase page. Please try again.');
-    }
-  }, [sdk, showToast]);
-
   // ----------------------------------------
   // Effects
   // ----------------------------------------
@@ -1121,7 +1082,6 @@ export function useBreezSdk(
     refreshWalletData,
     fetchUnclaimedDeposits,
     handleLogout,
-    handleBuyBitcoin,
     clearError: () => setError(null),
     dismissCelebration: () => setCelebrationPayment(null),
     subscribeToSdkEvents,

@@ -253,9 +253,6 @@ export function createMockClient(overrides?: Partial<BreezSdk>): BreezSdk {
       ] as Rate[],
     }),
 
-    // Buy Bitcoin
-    buyBitcoin: vi.fn().mockResolvedValue({ url: 'https://buy.moonpay.com/test' }),
-
     // Token metadata
     getTokensMetadata: vi.fn().mockResolvedValue([] as TokenMetadata[]),
   };
