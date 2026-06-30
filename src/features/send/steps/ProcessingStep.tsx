@@ -74,11 +74,24 @@ const ProcessingStep: React.FC<ProcessingStepProps> = ({ operationType = 'paymen
 
           {/* Icon */}
           {isAuth ? renderIcon() : (
-            <img
-              src="/assets/PEGGASUSD_Logo.png"
-              alt="Processing"
-              className="w-12 h-12 object-contain relative z-10"
-            />
+            <div className="relative z-10 flex flex-col items-center gap-1">
+              <img
+                src="/assets/PEGGASUSD_Logo.png"
+                alt="Processing"
+                className="w-12 h-12 object-contain"
+              />
+              <span
+                className="text-[9px] font-semibold tracking-[2.5px] uppercase"
+                style={{
+                  background: 'linear-gradient(135deg, #F7931A, #00C7B7)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                PEGGASUSD
+              </span>
+            </div>
           )}
         </div>
       </div>

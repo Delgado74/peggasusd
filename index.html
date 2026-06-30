@@ -31,10 +31,9 @@
   <meta name="twitter:description" content="Lightning wallet con saldo en SAT y USD" />
   
   <!-- Icons -->
-  <link rel="icon" type="image/svg+xml" href="/assets/Glow_Logo.svg" />
-  <link rel="icon" type="image/png" href="/icons/Glow_favicon.png" />
-  <link rel="apple-touch-icon" href="/icons/Glow-icon-maskable-192.png" />
-  <link rel="mask-icon" href="/icons/Glow-icon-maskable-192.png" color="#0a0a0f" />
+  <link rel="icon" type="image/png" href="/assets/PEGGASUSD_Logo.png" />
+  <link rel="apple-touch-icon" href="/assets/PEGGASUSD_Logo.png" />
+  <link rel="mask-icon" href="/assets/PEGGASUSD_Logo.png" color="#07090D" />
   
   <!-- Manifest -->
   <link rel="manifest" href="/manifest.json" />
@@ -143,6 +142,23 @@
       box-shadow: 0 0 6px #F7931A;
     }
 
+    .splash-text {
+      position: absolute;
+      bottom: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #F7931A, #00C7B7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+    }
+
     @keyframes rotate-stars {
       to { transform: rotate(360deg); }
     }
@@ -167,6 +183,7 @@
       </div>
       <div class="splash-ring"></div>
       <img class="splash-logo" src="/assets/PEGGASUSD_Logo.png" alt="PEGGASUSD" />
+      <span class="splash-text">PEGGASUSD</span>
     </div>
   </div>
   

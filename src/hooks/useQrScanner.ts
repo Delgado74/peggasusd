@@ -21,6 +21,7 @@ export interface UseQrScannerReturn {
   startScanning: () => Promise<void>;
   stopScanning: () => void;
   toggleCamera: () => void;
+  requestPermission: () => Promise<boolean>;
   clearError: () => void;
 }
 
@@ -61,16 +62,6 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
 
       if (!videoRef.current) {
         const errorMsg = 'Video element not available';
-        setError(errorMsg);
-        onError?.(errorMsg);
-        setIsInitializing(false);
-        return;
-      }
-
-      // Check if camera is available
-      const hasCamera = await QrScanner.hasCamera();
-      if (!hasCamera) {
-        const errorMsg = 'No camera found on this device';
         setError(errorMsg);
         onError?.(errorMsg);
         setIsInitializing(false);
@@ -165,6 +156,15 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
     }
   }, [facingMode]);
 
+  const requestPermission = useCallback(async (): Promise<boolean> => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: true });
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   return {
     videoRef,
     error,
@@ -176,6 +176,7 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
     startScanning,
     stopScanning,
     toggleCamera,
+    requestPermission,
     clearError,
   };
 };

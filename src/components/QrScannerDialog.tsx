@@ -52,12 +52,14 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
     startScanning,
     stopScanning,
     toggleCamera,
+    requestPermission,
     clearError,
   } = useQrScanner({ onScan: handleScan });
 
   // Use refs to avoid effect re-running when callbacks change
   const startScanningRef = useLatest(startScanning);
   const stopScanningRef = useLatest(stopScanning);
+  const requestPermissionRef = useLatest(requestPermission);
 
   useEffect(() => {
     // Capture the stop callback at effect start so cleanup invokes the
@@ -66,11 +68,17 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
     const stop = stopScanningRef.current;
     if (isOpen) {
       // Wait for the transition to complete (300ms) plus a buffer
-      const timer = setTimeout(() => {
+      const timer = setTimeout(async () => {
         logger.debug(LogCategory.UI, 'Checking video element after transition', {
           videoReady: Boolean(videoRef.current),
         });
         if (videoRef.current) {
+          // Request camera permission explicitly first
+          const granted = await requestPermissionRef.current();
+          if (!granted) {
+            logger.warn(LogCategory.UI, 'Camera permission denied');
+            return;
+          }
           startScanningRef.current();
         } else {
           logger.error(LogCategory.UI, 'Video element still null after transition');
@@ -84,7 +92,7 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
     } else {
       stop();
     }
-  }, [isOpen, videoRef, startScanningRef, stopScanningRef]);
+  }, [isOpen, videoRef, startScanningRef, stopScanningRef, requestPermissionRef]);
 
   const handleClose = () => {
     stopScanning();
@@ -181,12 +189,18 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
                     {errorType === 'permission' ? 'Camera permission denied' : 'Camera not available'}
                   </p>
                   {errorType === 'permission' ? (
-                    <p className="text-xs text-spark-text-muted">
+                    <p className="text-xs text-spark-text-muted mb-4">
                       Please enable camera access in your device settings to scan QR codes.
                     </p>
                   ) : (
-                    <p className="text-xs text-spark-text-muted">{error}</p>
+                    <p className="text-xs text-spark-text-muted mb-4">{error}</p>
                   )}
+                  <button
+                    onClick={() => { clearError(); startScanning(); }}
+                    className="px-6 py-2 bg-spark-primary text-black rounded-xl font-medium text-sm hover:brightness-110 transition-all"
+                  >
+                    Try Again
+                  </button>
                 </div>
               </div>
             )}

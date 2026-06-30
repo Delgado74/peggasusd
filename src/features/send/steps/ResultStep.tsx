@@ -99,6 +99,17 @@ const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operati
             alt="PEGGASUSD"
             className="w-14 h-14 object-contain relative z-10 drop-shadow-[0_0_20px_rgba(247,147,26,0.5)]"
           />
+          <span
+            className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[10px] font-semibold tracking-[2.5px] uppercase whitespace-nowrap"
+            style={{
+              background: 'linear-gradient(135deg, #F7931A, #00C7B7)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            PEGGASUSD
+          </span>
         </div>
       </div>
 

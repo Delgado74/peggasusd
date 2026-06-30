@@ -66,6 +66,17 @@ const UnlockingPage: React.FC = () => {
               alt="PEGGASUSD"
               className="w-16 h-16 relative z-10"
             />
+            <span
+              className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[11px] font-semibold tracking-[3px] uppercase whitespace-nowrap"
+              style={{
+                background: 'linear-gradient(135deg, #F7931A, #00C7B7)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              PEGGASUSD
+            </span>
           </div>
 
           <div className="flex items-center justify-center gap-3 text-spark-text-secondary text-sm">
