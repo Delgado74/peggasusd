@@ -67,36 +67,83 @@
       justify-content: center;
       z-index: 9999;
     }
-    
-    /* Elegant spinner */
-    .splash-loader {
-      width: 32px;
-      height: 32px;
+
+    .splash-content {
       position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    
-    .splash-loader::before {
-      content: '';
+
+    .splash-logo {
+      width: 64px;
+      height: 64px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .splash-stars {
       position: absolute;
       inset: 0;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      border-top-color: #F7931A;
-      border-right-color: rgba(247, 147, 26, 0.3);
-      animation: spin 1s cubic-bezier(0.5, 0.2, 0.5, 0.8) infinite;
+      animation: rotate-stars 12s linear infinite;
     }
-    
-    .splash-loader::after {
+
+    .splash-star {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: #F7931A;
+      border-radius: 50%;
+      box-shadow: 0 0 4px #F7931A, 0 0 8px rgba(247, 147, 26, 0.4);
+    }
+
+    .splash-star:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+    .splash-star:nth-child(2) { top: 2%; right: 12%; }
+    .splash-star:nth-child(3) { right: 0; top: 30%; }
+    .splash-star:nth-child(4) { right: 2%; bottom: 25%; }
+    .splash-star:nth-child(5) { bottom: 2%; right: 15%; }
+    .splash-star:nth-child(6) { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .splash-star:nth-child(7) { bottom: 2%; left: 15%; }
+    .splash-star:nth-child(8) { left: 2%; bottom: 25%; }
+    .splash-star:nth-child(9) { left: 0; top: 30%; }
+    .splash-star:nth-child(10) { top: 2%; left: 12%; }
+
+    .splash-star:nth-child(1),
+    .splash-star:nth-child(6) {
+      background: #00C7B7;
+      box-shadow: 0 0 4px #00C7B7, 0 0 8px rgba(0, 199, 183, 0.4);
+    }
+
+    .splash-star:nth-child(3),
+    .splash-star:nth-child(8) {
+      background: #00C7B7;
+      box-shadow: 0 0 4px #00C7B7, 0 0 8px rgba(0, 199, 183, 0.4);
+    }
+
+    .splash-ring {
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(247, 147, 26, 0.1);
+      animation: rotate-stars 8s linear infinite reverse;
+    }
+
+    .splash-ring::before {
       content: '';
       position: absolute;
-      inset: 6px;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background: #F7931A;
       border-radius: 50%;
-      border: 1.5px solid transparent;
-      border-top-color: rgba(212, 165, 116, 0.6);
-      animation: spin 0.6s cubic-bezier(0.5, 0.2, 0.5, 0.8) infinite reverse;
+      box-shadow: 0 0 6px #F7931A;
     }
-    
-    @keyframes spin {
+
+    @keyframes rotate-stars {
       to { transform: rotate(360deg); }
     }
   </style>
@@ -105,7 +152,22 @@
 <body>
   <!-- Splash screen shown during initial load -->
   <div id="splash">
-    <div class="splash-loader"></div>
+    <div class="splash-content">
+      <div class="splash-stars">
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+        <div class="splash-star"></div>
+      </div>
+      <div class="splash-ring"></div>
+      <img class="splash-logo" src="/assets/PEGGASUSD_Logo.png" alt="PEGGASUSD" />
+    </div>
   </div>
   
   <div id="root"></div>

@@ -13,6 +13,7 @@ export interface UseQrScannerOptions {
 export interface UseQrScannerReturn {
   videoRef: React.RefObject<HTMLVideoElement>;
   error: string | null;
+  errorType: 'permission' | 'not-found' | 'in-use' | 'constraint' | 'generic' | null;
   isScanning: boolean;
   isInitializing: boolean;
   facingMode: FacingMode;
@@ -32,6 +33,7 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
   const qrScannerRef = useRef<QrScanner | null>(null);
 
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<'permission' | 'not-found' | 'in-use' | 'constraint' | 'generic' | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const [facingMode, setFacingMode] = useState<FacingMode>('environment');
@@ -39,6 +41,7 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
 
   const clearError = useCallback(() => {
     setError(null);
+    setErrorType(null);
   }, []);
 
   const stopScanning = useCallback(() => {
@@ -124,20 +127,26 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
         error: formatError(err),
       });
       let errorMessage = 'Camera access denied or not available';
+      let eType: 'permission' | 'not-found' | 'in-use' | 'constraint' | 'generic' = 'generic';
 
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
           errorMessage = 'Camera access denied. Please allow camera access and try again.';
+          eType = 'permission';
         } else if (err.name === 'NotFoundError') {
           errorMessage = 'No camera found on this device';
+          eType = 'not-found';
         } else if (err.name === 'NotReadableError') {
           errorMessage = 'Camera is already in use by another application';
+          eType = 'in-use';
         } else if (err.name === 'OverconstrainedError') {
           errorMessage = 'Camera constraints not supported';
+          eType = 'constraint';
         }
       }
 
       setError(errorMessage);
+      setErrorType(eType);
       onError?.(errorMessage);
       setIsInitializing(false);
       setIsScanning(false);
@@ -159,6 +168,7 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
   return {
     videoRef,
     error,
+    errorType,
     isScanning,
     isInitializing,
     facingMode,

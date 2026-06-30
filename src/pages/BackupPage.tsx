@@ -7,6 +7,7 @@ import {
 } from '@/services/passkeyService';
 import { deviceOnlyStorage, secureStorage, getBiometryLabel } from '@/services/secureStorage';
 import { logger, LogCategory } from '@/services/logger';
+import { t } from '../services/locale';
 
 interface BackupPageProps {
   onBack: () => void;
@@ -157,7 +158,7 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
   const words = mnemonic ? mnemonic.split(' ') : [];
 
   return (
-    <SlideInPage title="Backup" onClose={onBack} slideFrom="left">
+    <SlideInPage title={t('backup.title')} onClose={onBack} slideFrom="left">
       <div className="p-4">
         <div className="max-w-xl mx-auto w-full space-y-6">
           {/* Passkey info card */}
@@ -168,9 +169,9 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
                   <PasskeyIcon size="md" className="text-spark-primary" />
                 </div>
                 <div>
-                  <h4 className="font-medium text-spark-text-primary mb-1">Passkey Protected</h4>
+                  <h4 className="font-medium text-spark-text-primary mb-1">{t('backup.passkeyProtected')}</h4>
                   <p className="text-spark-text-muted text-sm">
-                    Your recovery phrase is derived from your passkey. To restore on another device, use your passkey or the recovery phrase below.
+                    {t('backup.passkeyProtectedDesc')}
                   </p>
                 </div>
               </div>
@@ -194,10 +195,10 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
                 )}
               </div>
               <span className="font-display font-semibold text-spark-text-primary">
-                {isLoading ? 'Authenticating...' : 'Tap to reveal phrase'}
+                {isLoading ? t('unlock.unlocking') : t('backup.revealPhrase')}
               </span>
               <span className="text-sm text-spark-text-muted">
-                {isLoading ? 'Complete passkey authentication' : 'Requires passkey authentication'}
+                {isLoading ? t('backup.completeAuth') : t('backup.authRequired')}
               </span>
             </button>
           )}
@@ -211,8 +212,8 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
               <div className="w-16 h-16 rounded-2xl bg-spark-primary/20 flex items-center justify-center">
                 <EyeIcon size="xl" className="text-spark-primary" />
               </div>
-              <span className="font-display font-semibold text-spark-text-primary">Tap to reveal phrase</span>
-              <span className="text-sm text-spark-text-muted">Make sure no one is watching</span>
+              <span className="font-display font-semibold text-spark-text-primary">{t('backup.revealPhrase')}</span>
+              <span className="text-sm text-spark-text-muted">{t('backup.noOneWatching')}</span>
             </button>
           )}
 
@@ -246,7 +247,7 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
                 )}
               </div>
               <span className="font-display font-semibold text-spark-text-primary">
-                {isLoading ? 'Authenticating...' : 'Tap to reveal phrase'}
+                {isLoading ? t('unlock.unlocking') : t('backup.revealPhrase')}
               </span>
               <span className="text-sm text-spark-text-muted">
                 {isLoading
@@ -268,9 +269,9 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
               <div className="w-16 h-16 rounded-2xl bg-spark-error/20 flex items-center justify-center mx-auto mb-4">
                 <WarningIcon size="xl" className="text-spark-error" />
               </div>
-              <h3 className="font-display font-semibold text-spark-text-primary mb-2">Passkey Unavailable</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-2">{t('backup.passkeyUnavailable')}</h3>
               <p className="text-spark-text-muted text-sm">
-                Your recovery phrase is derived from your passkey. Without it, the phrase cannot be retrieved on this device. Sign in on a device where the passkey is still available to view it.
+                {t('backup.passkeyUnavailableDesc')}
               </p>
             </div>
           )}
@@ -279,13 +280,13 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
           {isRevealed && mnemonic && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-spark-text-secondary">Recovery Phrase</span>
+                <span className="text-sm font-medium text-spark-text-secondary">{t('backup.recoveryPhrase')}</span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleHide}
                     className="px-3 py-1.5 text-sm font-medium text-spark-text-muted hover:text-spark-text-primary border border-spark-border rounded-lg hover:bg-white/5 transition-colors"
                   >
-                    Hide
+                    {t('backup.hide')}
                   </button>
                   <button
                     onClick={handleCopy}
@@ -297,7 +298,7 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
                       }
                     `}
                   >
-                    {copied ? 'Copied!' : 'Copy'}
+                    {copied ? t('copied') : t('copy')}
                   </button>
                 </div>
               </div>
@@ -326,9 +327,9 @@ const BackupPage: React.FC<BackupPageProps> = ({ onBack }) => {
               <div className="w-16 h-16 rounded-2xl bg-spark-error/20 flex items-center justify-center mx-auto mb-4">
                 <WarningIcon size="xl" className="text-spark-error" />
               </div>
-              <h3 className="font-display font-semibold text-spark-text-primary mb-2">No Backup Found</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-2">{t('backup.noBackupFound')}</h3>
               <p className="text-spark-text-muted text-sm">
-                Could not find a recovery phrase for this wallet.
+                {t('backup.noBackupDesc')}
               </p>
             </div>
           )}

@@ -8,6 +8,7 @@ import SlideInPage from '../components/layout/SlideInPage';
 import { logger, LogCategory } from '@/services/logger';
 import { shareOrDownloadLogs, exportDatabaseState } from '@/services/logExport';
 import { useSecretTap } from '@/hooks/useSecretTap';
+import { t } from '../services/locale';
 
 const DEV_MODE_STORAGE_KEY = 'spark-dev-mode';
 
@@ -181,12 +182,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const footer = isDevMode ? (
     <PrimaryButton className="w-full" onClick={handleSave}>
-      Save Changes
+      {t('settings.saveChanges')}
     </PrimaryButton>
   ) : undefined;
 
   return (
-    <SlideInPage title="Settings" onClose={onBack} slideFrom="left" footer={footer}>
+    <SlideInPage title={t('settings.title')} onClose={onBack} slideFrom="left" footer={footer}>
       <div className="p-4">
         <div className="max-w-xl mx-auto w-full space-y-4">
           {/* Order: page nav, exports, reconnect, toggles, inputs.
@@ -195,7 +196,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
           {/* Display */}
           <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-            <h3 className="font-display font-semibold text-spark-text-primary mb-3">Display</h3>
+            <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.display')}</h3>
             <div className="space-y-2">
               <button
                 className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:bg-white/5 transition-colors"
@@ -204,7 +205,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <CurrencyIcon size="md" />
-                  <span>Fiat Currencies</span>
+                  <span>{t('settings.fiatCurrencies')}</span>
                 </div>
                 <ChevronRightIcon size="md" />
               </button>
@@ -214,7 +215,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           {/* Passkey & Labels */}
           {isDevMode && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-              <h3 className="font-display font-semibold text-spark-text-primary mb-3">Passkey</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.passkey')}</h3>
               <button
                 className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:bg-white/5 transition-colors"
                 type="button"
@@ -222,7 +223,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <ShieldCheckIcon size="md" />
-                  <span>Passkey & Labels</span>
+                  <span>{t('settings.passkeyLabels')}</span>
                 </div>
                 <ChevronRightIcon size="md" />
               </button>
@@ -231,7 +232,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
           {/* Diagnostics */}
           <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-            <h3 className="font-display font-semibold text-spark-text-primary mb-3">Diagnostics</h3>
+            <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.diagnostics')}</h3>
             <button
               className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:bg-white/5 transition-colors disabled:opacity-50"
               type="button"
@@ -243,14 +244,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
               ) : (
                 <DownloadIcon size="md" />
               )}
-              {isDownloadingLogs ? 'Preparing...' : 'Download Logs'}
+              {isDownloadingLogs ? t('settings.preparing') : t('settings.downloadLogs')}
             </button>
           </div>
 
           {/* Database */}
           {isDevMode && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-              <h3 className="font-display font-semibold text-spark-text-primary mb-3">Database</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.database')}</h3>
               <button
                 className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:bg-white/5 transition-colors disabled:opacity-50"
                 type="button"
@@ -262,7 +263,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                 ) : (
                   <DownloadIcon size="md" />
                 )}
-                {isExportingDb ? 'Exporting...' : 'Export Database'}
+                {isExportingDb ? t('settings.exporting') : t('settings.exportDatabase')}
               </button>
             </div>
           )}
@@ -270,7 +271,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           {/* Network */}
           {isDevMode && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-              <h3 className="font-display font-semibold text-spark-text-primary mb-3">Network</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.network')}</h3>
               <div className="flex gap-2">
                 {(['mainnet', 'regtest'] as Network[]).map((network) => (
                   <button
@@ -281,12 +282,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                         : 'bg-spark-surface border border-spark-border text-spark-text-secondary hover:text-spark-text-primary hover:border-spark-border-light'
                       }`}
                   >
-                    {network === 'mainnet' ? 'Mainnet' : 'Regtest'}
+                    {network === 'mainnet' ? t('settings.mainnet') : t('settings.regtest')}
                   </button>
                 ))}
               </div>
               <p className="text-xs text-spark-text-muted mt-2">
-                Changing network will reload the app and reconnect.
+                {t('settings.networkHelp')}
               </p>
             </div>
           )}
@@ -295,13 +296,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           {isDevMode && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
-                <h3 className="font-display font-semibold text-spark-text-primary">Privacy</h3>
+                <h3 className="font-display font-semibold text-spark-text-primary">{t('settings.privacy')}</h3>
                 {isLoadingUserSettings && <LoadingSpinner size="small" />}
               </div>
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <span className="font-display font-medium text-spark-text-primary block">Private Mode</span>
-                  <span className="text-sm text-spark-text-muted">Hide your address from public explorers (not suitable for zaps)</span>
+                  <span className="font-display font-medium text-spark-text-primary block">{t('settings.privateMode')}</span>
+                  <span className="text-sm text-spark-text-muted">{t('settings.privateModeDesc')}</span>
                 </div>
                 <Switch
                   checked={sparkPrivateModeEnabled}
@@ -317,8 +318,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <span className="font-display font-medium text-spark-text-primary block">Prefer Spark</span>
-                  <span className="text-sm text-spark-text-muted">Use Spark address over Lightning invoice when available</span>
+                  <span className="font-display font-medium text-spark-text-primary block">{t('settings.preferSpark')}</span>
+                  <span className="text-sm text-spark-text-muted">{t('settings.preferSparkDesc')}</span>
                 </div>
                 <Switch
                   checked={preferSparkOverLightning}
@@ -333,8 +334,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <span className="font-display font-medium text-spark-text-primary block">Send USD</span>
-                  <span className="text-sm text-spark-text-muted">Enable sending to USDC/USDT addresses on other chains</span>
+                  <span className="font-display font-medium text-spark-text-primary block">{t('settings.sendUsd')}</span>
+                  <span className="text-sm text-spark-text-muted">{t('settings.sendUsdDesc')}</span>
                 </div>
                 <Switch
                   checked={crossChainEnabled}
@@ -347,18 +348,18 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           {/* Deposit Claim Fee */}
           {isDevMode && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-              <h3 className="font-display font-semibold text-spark-text-primary mb-3">Deposit Claim Fee</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.depositClaimFee')}</h3>
               <FormGroup>
                 <div className="flex gap-2 items-center">
                   <select
                     value={feeType}
                     onChange={(e) => setFeeType(e.currentTarget.value as 'fixed' | 'rate' | 'networkRecommended')}
                     className="min-w-[160px] bg-spark-surface border border-spark-border rounded-xl px-3 py-3 text-spark-text-primary text-sm focus:border-spark-primary focus:ring-2 focus:ring-spark-primary/20"
-                    aria-label="Max fee type"
+                    aria-label={t('settings.maxFeeType')}
                   >
-                    <option className="bg-spark-surface" value="fixed">Fixed (sats)</option>
-                    <option className="bg-spark-surface" value="rate">Rate (sat/vB)</option>
-                    <option className="bg-spark-surface" value="networkRecommended">Network + leeway</option>
+                    <option className="bg-spark-surface" value="fixed">{t('settings.fixedSats')}</option>
+                    <option className="bg-spark-surface" value="rate">{t('settings.rateSatVb')}</option>
+                    <option className="bg-spark-surface" value="networkRecommended">{t('settings.networkLeeway')}</option>
                   </select>
                   <div className="flex-1">
                     <FormInput
@@ -378,10 +379,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           {/* Sync Settings */}
           {isDevMode && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-              <h3 className="font-display font-semibold text-spark-text-primary mb-3">Sync Settings</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.syncInterval')}</h3>
               <FormGroup>
                 <label htmlFor="sync-interval" className="block text-sm text-spark-text-secondary mb-1">
-                  Sync interval (seconds)
+                  {t('settings.syncInterval')}
                 </label>
                 <FormInput
                   id="sync-interval"
@@ -389,7 +390,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                   min={0}
                   value={syncIntervalSecs}
                   onChange={(e) => setSyncIntervalSecs(e.target.value)}
-                  placeholder="e.g. 30"
+                  placeholder={t('settings.e.g30')}
                 />
               </FormGroup>
             </div>
@@ -398,17 +399,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
           {/* LNURL */}
           {isDevMode && (
             <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-              <h3 className="font-display font-semibold text-spark-text-primary mb-3">LNURL</h3>
+              <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('settings.lnurl')}</h3>
               <FormGroup>
                 <label htmlFor="lnurl-domain" className="block text-sm text-spark-text-secondary mb-1">
-                  Custom domain
+                  {t('settings.customDomain')}
                 </label>
                 <FormInput
                   id="lnurl-domain"
                   type="text"
                   value={lnurlDomain}
                   onChange={(e) => setLnurlDomain(e.target.value)}
-                  placeholder="example.com"
+                  placeholder={t('settings.exampleDotCom')}
                 />
               </FormGroup>
             </div>
@@ -420,12 +421,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
               onClick={devTap}
               className="text-spark-text-muted text-xs hover:text-spark-text-secondary transition-colors select-none"
             >
-              PEGGASUSD v1.0.0
-              {isDevMode && <span className="ml-1 text-spark-primary">(dev)</span>}
+              {t('settings.version')}
+              {isDevMode && <span className="ml-1 text-spark-primary">{t('settings.dev')}</span>}
             </button>
             {devTapCount > 0 && devTapCount < devTapThreshold && (
               <p className="text-xs text-spark-text-muted mt-1">
-                {devTapThreshold - devTapCount} more taps to {isDevMode ? 'disable' : 'enable'} dev mode
+                {devTapThreshold - devTapCount} {t('settings.devModeTaps')} {isDevMode ? t('settings.disable') : t('settings.enable')} dev mode
               </p>
             )}
           </div>

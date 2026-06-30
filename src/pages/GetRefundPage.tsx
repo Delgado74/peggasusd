@@ -9,6 +9,7 @@ import { isDepositRejected, removeRejectedDeposit } from '../services/depositSta
 import { formatWithSpaces } from '../utils/formatNumber';
 import SlideInPage from '@/components/layout/SlideInPage';
 import { logger, LogCategory } from '@/services/logger';
+import { t } from '../services/locale';
 
 interface GetRefundPageProps {
   onBack: () => void;
@@ -79,7 +80,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
       logger.error(LogCategory.PAYMENT, 'Failed to load rejected deposits', {
         error: e instanceof Error ? e.message : String(e),
       });
-      setError('Failed to load rejected deposits');
+      setError(t('refund.failedToLoad'));
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +99,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
         logger.error(LogCategory.PAYMENT, 'Failed to load rejected deposits', {
           error: e instanceof Error ? e.message : String(e),
         });
-        setError('Failed to load rejected deposits');
+        setError(t('refund.failedToLoad'));
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -174,7 +175,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
       logger.error(LogCategory.PAYMENT, 'Failed to refund deposit', {
         error: e instanceof Error ? e.message : String(e),
       });
-      setRefundError(e instanceof Error ? e.message : 'Failed to refund deposit');
+      setRefundError(e instanceof Error ? e.message : t('refund.failedToRefund'));
       setRefundStep('confirm');
     } finally {
       setIsProcessing(false);
@@ -204,14 +205,14 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
   };
 
   return (
-    <SlideInPage title="Get Refund" onClose={onBack} slideFrom={animationDirection}>
+    <SlideInPage title={t('refund.title')} onClose={onBack} slideFrom={animationDirection}>
       <div className="p-4">
         <div className="max-w-xl mx-auto w-full space-y-6">
           {/* Content */}
           <div className="flex-1 overflow-y-auto">
             {isLoading && (
               <div className="py-16 flex justify-center">
-                <LoadingSpinner text="Loading rejected deposits..." />
+                <LoadingSpinner text={t('refund.loading')} />
               </div>
             )}
 
@@ -224,8 +225,8 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                 <div className="w-16 h-16 rounded-2xl bg-spark-success/20 flex items-center justify-center mx-auto mb-4">
                   <CheckIcon size="xl" className="text-spark-success" />
                 </div>
-                <h3 className="font-display font-semibold text-spark-text-primary mb-2">All Clear!</h3>
-                <p className="text-spark-text-muted text-sm">No rejected deposits pending refund.</p>
+                <h3 className="font-display font-semibold text-spark-text-primary mb-2">{t('refund.allClear')}</h3>
+                <p className="text-spark-text-muted text-sm">{t('refund.noDeposits')}</p>
               </div>
             )}
 
@@ -246,7 +247,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                     >
                       {/* Amount */}
                       <div className="flex items-center justify-between py-2">
-                        <span className="text-spark-text-secondary text-sm">Amount</span>
+                        <span className="text-spark-text-secondary text-sm">{t('refund.amount')}</span>
                         <span className="font-mono text-sm font-medium text-spark-text-primary">
                           <span className="inline-flex items-center"><span className="text-[0.8em] opacity-70 mr-px">₿</span>{formatWithSpaces(amount)}</span>
                         </span>
@@ -255,7 +256,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                       {/* Transaction IDs */}
                       <div className="space-y-2">
                         <CollapsibleCodeField
-                          label="Transaction ID"
+                          label={t('refund.transactionId')}
                           value={dep.txid}
                           isVisible={expandedTxIds[txKey] || false}
                           onToggle={() => setExpandedTxIds(prev => ({ ...prev, [txKey]: !prev[txKey] }))}
@@ -264,7 +265,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
 
                         {isRefunded && refundedTxId && (
                           <CollapsibleCodeField
-                            label="Refund Transaction ID"
+                            label={t('refund.refundTransactionId')}
                             value={refundedTxId}
                             isVisible={expandedTxIds[refundKey] || false}
                             onToggle={() => setExpandedTxIds(prev => ({ ...prev, [refundKey]: !prev[refundKey] }))}
@@ -277,14 +278,14 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                       <div>
                         {isRefunded ? (
                           <button disabled className="w-full px-4 py-3 bg-spark-electric/15 text-spark-electric rounded-xl font-medium cursor-not-allowed">
-                            <span className="animate-pulse-slow">Broadcasting</span>
+                            <span className="animate-pulse-slow">{t('refund.broadcasting')}</span>
                           </button>
                         ) : (
                           <PrimaryButton
                             onClick={() => openRefundFlow(dep)}
                             className="w-full"
                           >
-                            Continue
+                            {t('refund.continue')}
                           </PrimaryButton>
                         )}
                       </div>
@@ -300,7 +301,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
       <BottomSheetContainer isOpen={isRefundFlowOpen} onClose={closeRefundFlow}>
         <BottomSheetCard>
           <DialogHeader
-            title={refundStep === 'result' ? (refundSuccess ? 'Refund Sent' : 'Refund Failed') : 'Refund to Bitcoin'}
+            title={refundStep === 'result' ? (refundSuccess ? t('refund.refundSent') : t('refund.refundFailed')) : t('refund.refundToBitcoin')}
             onClose={closeRefundFlow}
           />
 
@@ -310,7 +311,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
               <>
                 <div>
                   <label className="block text-sm font-medium text-spark-text-secondary mb-2">
-                    Destination
+                    {t('refund.destination')}
                   </label>
                   <FormInput
                     id="refund-destination"
@@ -320,20 +321,20 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                     placeholder="bc1q..."
                   />
                   <p className="text-spark-text-muted text-xs mt-2">
-                    Enter the Bitcoin address where you want to receive the refund.
+                    {t('refund.destinationHelp')}
                   </p>
                 </div>
 
                 <div className="flex gap-3">
                   <SecondaryButton onClick={closeRefundFlow} className="flex-1">
-                    Cancel
+                    {t('cancel')}
                   </SecondaryButton>
                   <PrimaryButton
                     onClick={handleContinueToFeeSelection}
                     disabled={!destination.trim()}
                     className="flex-1"
                   >
-                    Continue
+                    {t('refund.continue')}
                   </PrimaryButton>
                 </div>
               </>
@@ -344,7 +345,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
               <>
                 <div>
                   <label className="block text-sm font-medium text-[rgb(var(--text-white))] mb-2">
-                    Select Fee Rate
+                    {t('refund.selectFeeRate')}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     <button
@@ -357,7 +358,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                       {selectedFeeRate === 'slow' && (
                         <RadioCheckIcon className="absolute top-2 right-2" />
                       )}
-                      <div>Slow</div>
+                      <div>{t('refund.slow')}</div>
                       <div className="text-xs opacity-70">₿{formatWithSpaces(feeEstimates.slow)}</div>
                     </button>
                     <button
@@ -370,7 +371,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                       {selectedFeeRate === 'medium' && (
                         <RadioCheckIcon className="absolute top-2 right-2" />
                       )}
-                      <div>Medium</div>
+                      <div>{t('refund.medium')}</div>
                       <div className="text-xs opacity-70">₿{formatWithSpaces(feeEstimates.medium)}</div>
                     </button>
                     <button
@@ -383,7 +384,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                       {selectedFeeRate === 'fast' && (
                         <RadioCheckIcon className="absolute top-2 right-2" />
                       )}
-                      <div>Fast</div>
+                      <div>{t('refund.fast')}</div>
                       <div className="text-xs opacity-70">₿{formatWithSpaces(feeEstimates.fast)}</div>
                     </button>
                   </div>
@@ -391,14 +392,14 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
 
                 <div className="flex gap-3">
                   <PrimaryButton onClick={() => setRefundStep('address')} className="flex-1 bg-gray-600 hover:bg-gray-700 text-white" disabled={false}>
-                    Back
+                    {t('back')}
                   </PrimaryButton>
                   <PrimaryButton
                     onClick={() => setRefundStep('confirm')}
                     disabled={!selectedFeeRate}
                     className="flex-1"
                   >
-                    Continue
+                    {t('refund.continue')}
                   </PrimaryButton>
                 </div>
               </>
@@ -410,9 +411,9 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                 {/* Breakdown */}
                 <FeeBreakdownCard
                   items={[
-                    { label: 'Amount', value: selectedDeposit.amountSats },
-                    { label: 'Network fee', value: getSelectedFee() },
-                    { label: 'You receive', value: getRefundAmount(), highlight: true },
+                    { label: t('refund.amount'), value: selectedDeposit.amountSats },
+                    { label: t('refund.networkFee'), value: getSelectedFee() },
+                    { label: t('refund.youReceive'), value: getRefundAmount(), highlight: true },
                   ]}
                 />
 
@@ -422,7 +423,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                       <div className="w-10 h-10 rounded-xl bg-spark-warning/20 flex items-center justify-center shrink-0">
                         <WarningIcon size="md" className="text-spark-warning" />
                       </div>
-                      <h3 className="font-display font-bold text-spark-warning">Refund Failed</h3>
+                      <h3 className="font-display font-bold text-spark-warning">{t('refund.refundFailed')}</h3>
                     </div>
                     <div className="pl-[52px]">
                       <p className="text-spark-error text-sm">{refundError}</p>
@@ -432,14 +433,14 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
 
                 <div className="flex gap-3">
                   <SecondaryButton onClick={() => setRefundStep('fee')} className="flex-1">
-                    Back
+                    {t('back')}
                   </SecondaryButton>
                   <PrimaryButton
                     onClick={handleRefund}
                     disabled={isProcessing}
                     className="flex-1"
                   >
-                    Refund
+                    {t('refund.refund')}
                   </PrimaryButton>
                 </div>
               </>
@@ -448,7 +449,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
             {/* Step 4: Processing */}
             {refundStep === 'processing' && (
               <div className="py-8 flex flex-col items-center justify-center">
-                <LoadingSpinner text="Processing refund..." />
+                <LoadingSpinner text={t('refund.processing')} />
               </div>
             )}
 
@@ -462,10 +463,10 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                         <CheckIcon size="xl" className="text-spark-success" />
                       </div>
                       <h3 className="font-display font-semibold text-spark-text-primary text-lg mb-2">
-                        Refund Broadcast
+                        {t('refund.refundBroadcast')}
                       </h3>
                       <p className="text-spark-text-muted text-sm">
-                        Your refund has been sent to the Bitcoin network.
+                        {t('refund.refundBroadcastDesc')}
                       </p>
                     </>
                   ) : (
@@ -474,7 +475,7 @@ const GetRefundPage: React.FC<GetRefundPageProps> = ({ onBack, animationDirectio
                         <CloseIcon size="xl" className="text-spark-error" />
                       </div>
                       <h3 className="font-display font-semibold text-spark-text-primary text-lg mb-2">
-                        Refund Failed
+                        {t('refund.refundFailed')}
                       </h3>
                       <p className="text-spark-error text-sm">
                         {refundError || 'An error occurred while processing your refund.'}

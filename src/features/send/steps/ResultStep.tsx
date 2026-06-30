@@ -1,7 +1,6 @@
 import React from 'react';
 import { PrimaryButton, ErrorMessageBox } from '../../../components/ui';
 import { CloseIcon } from '../../../components/Icons';
-import GlowLogo from '../../../components/GlowLogo';
 
 export interface ResultStepProps {
   result: 'success' | 'failure';
@@ -85,13 +84,20 @@ const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operati
       {/* Result icon */}
       <div className="relative mb-6">
         {/* Glow effect */}
-        <div className="absolute -inset-3 rounded-full blur-xl" style={{ background: 'rgba(212,165,116,0.20)' }} />
+        <div className="absolute -inset-3 rounded-full blur-xl" style={{ background: 'rgba(247,147,26,0.20)' }} />
 
-        {/* Logo */}
+        {/* Logo with stars */}
         <div className="relative w-20 h-20 flex items-center justify-center">
-          <GlowLogo
-            sizePx={64}
-            imgClassName="drop-shadow-[0_0_20px_rgba(247,147,26,0.5)]"
+          <div className="absolute inset-0 animate-[spin_10s_linear_infinite]">
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ top: '0', left: '50%', transform: 'translateX(-50%)' }} />
+            <div className="absolute w-1 h-1 bg-[#00C7B7] rounded-full shadow-[0_0_4px_#00C7B7]" style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)' }} />
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ left: '0', top: '50%', transform: 'translateY(-50%)' }} />
+            <div className="absolute w-1 h-1 bg-[#00C7B7] rounded-full shadow-[0_0_4px_#00C7B7]" style={{ right: '0', top: '50%', transform: 'translateY(-50%)' }} />
+          </div>
+          <img
+            src="/assets/PEGGASUSD_Logo.png"
+            alt="PEGGASUSD"
+            className="w-14 h-14 object-contain relative z-10 drop-shadow-[0_0_20px_rgba(247,147,26,0.5)]"
           />
         </div>
       </div>

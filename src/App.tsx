@@ -18,6 +18,7 @@ import GetRefundPage from './pages/GetRefundPage';
 import BackupPage from './pages/BackupPage';
 import PasskeyPage from './pages/PasskeyPage';
 import SettingsPage from './pages/SettingsPage';
+import AboutPage from './pages/AboutPage';
 import FiatCurrenciesPage from './pages/FiatCurrenciesPage';
 import UnlockPage from './pages/UnlockPage';
 import UnlockingPage from './pages/UnlockingPage';
@@ -37,7 +38,7 @@ import { STATUS_BAR_LOADING } from './utils/statusBarManager';
 import { useBackButton } from './hooks/useBackButton';
 import type { Seed, Payment } from '@breeztech/breez-sdk-spark';
 
-type Screen = 'home' | 'restore' | 'generate' | 'wallet' | 'getRefund' | 'settings' | 'backup' | 'fiatCurrencies' | 'passkey' | 'unlock' | 'unlocking' | 'passkeySettings' | 'passkeyManagement' | 'labels' | 'passkeyLocalState';
+type Screen = 'home' | 'restore' | 'generate' | 'wallet' | 'getRefund' | 'settings' | 'about' | 'backup' | 'fiatCurrencies' | 'passkey' | 'unlock' | 'unlocking' | 'passkeySettings' | 'passkeyManagement' | 'labels' | 'passkeyLocalState';
 
 // Full-screen dim spinner shown while sdk.isLoading is true (logout in
 // progress, SDK reconnect, etc). Wrapped as its own component so the
@@ -141,6 +142,7 @@ const AppContent: React.FC = () => {
   useBackButton(useCallback(() => {
     switch (currentScreen) {
       case 'settings':
+      case 'about':
       case 'backup':
       case 'getRefund':
         setUserScreen('wallet');
@@ -248,6 +250,7 @@ const AppContent: React.FC = () => {
             setUserScreen('getRefund');
           }}
           onOpenSettings={() => setUserScreen('settings')}
+          onOpenAbout={() => setUserScreen('about')}
           onOpenBackup={() => setUserScreen('backup')}
           onDepositChanged={sdk.fetchUnclaimedDeposits}
         />
@@ -427,6 +430,14 @@ const AppContent: React.FC = () => {
           <>
             {renderWalletPage()}
             <BackupPage onBack={() => setUserScreen('wallet')} />
+          </>
+        );
+
+      case 'about':
+        return (
+          <>
+            {renderWalletPage()}
+            <AboutPage onBack={() => setUserScreen('wallet')} />
           </>
         );
 

@@ -13,6 +13,7 @@ import ReceivePaymentDialog from '../features/receive/ReceivePaymentDialog';
 import QrScannerDialog from '../components/QrScannerDialog';
 import PaymentDetailsDialog from '../components/PaymentDetailsDialog';
 import { useLatest } from '../hooks/useLatest';
+import { t } from '../services/locale';
 import UnclaimedDepositDetailsPage from './UnclaimedDepositDetailsPage';
 import SaveContactDialog from '../features/send/components/SaveContactDialog';
 import { useStatusBarColor } from '../hooks/useStatusBarColor';
@@ -30,6 +31,7 @@ interface WalletPageProps {
   hasRejectedDeposits: boolean;
   onOpenGetRefund: (source?: 'menu' | 'icon') => void;
   onOpenSettings: () => void;
+  onOpenAbout: () => void;
   onOpenBackup: () => void;
   onDepositChanged?: () => void;
 }
@@ -44,6 +46,7 @@ const WalletPage: React.FC<WalletPageProps> = ({
   hasRejectedDeposits,
   onOpenGetRefund,
   onOpenSettings,
+  onOpenAbout,
   onOpenBackup,
   onDepositChanged,
 }) => {
@@ -136,8 +139,8 @@ const WalletPage: React.FC<WalletPageProps> = ({
   const handleSuccessfulSend = useCallback((lightningAddress?: string) => {
     if (lightningAddress) {
       setTimeout(() => {
-        showToast('info', 'Save as contact?', lightningAddress, {
-          label: 'Save',
+        showToast('info', t('wallet.saveContact'), lightningAddress, {
+          label: t('wallet.save'),
           onClick: () => {
             setSaveContactSession(s => s + 1);
             setSaveContactAddress(lightningAddress);
@@ -281,14 +284,14 @@ const WalletPage: React.FC<WalletPageProps> = ({
           data-testid="send-button"
         >
           <ArrowUpIcon />
-          <span>Send</span>
+          <span>{t('send')}</span>
         </button>
 
         {/* QR Scanner button - viewfinder style */}
         <button
           onClick={() => setIsQrScannerOpen(true)}
           className="qr-scanner-button"
-          aria-label="Scan QR Code"
+          aria-label={t('scan')}
           data-testid="scan-button"
         >
           <span className="qr-corner qr-corner--tl" />
@@ -305,7 +308,7 @@ const WalletPage: React.FC<WalletPageProps> = ({
           data-testid="receive-button"
         >
           <ArrowDownIcon />
-          <span>Receive</span>
+          <span>{t('receive')}</span>
         </button>
       </div>
 
@@ -323,6 +326,7 @@ const WalletPage: React.FC<WalletPageProps> = ({
         onClose={() => setIsMenuOpen(false)}
         onLogout={onLogout}
         onOpenSettings={onOpenSettings}
+        onOpenAbout={onOpenAbout}
         onOpenBackup={onOpenBackup}
         onOpenRefund={() => onOpenGetRefund('menu')}
         hasRejectedDeposits={hasRejectedDeposits}

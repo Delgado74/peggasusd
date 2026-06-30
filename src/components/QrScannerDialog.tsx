@@ -44,6 +44,7 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
   const {
     videoRef,
     error,
+    errorType,
     isScanning,
     isInitializing,
     facingMode,
@@ -176,8 +177,16 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
                   <div className="w-16 h-16 rounded-full bg-spark-error/20 flex items-center justify-center mx-auto mb-4">
                     <AlertTriangleIcon size="xl" className="text-spark-error" />
                   </div>
-                  <p className="text-sm mb-2 font-medium">Camera not available</p>
-                  <p className="text-xs text-spark-text-muted">{error}</p>
+                  <p className="text-sm mb-2 font-medium">
+                    {errorType === 'permission' ? 'Camera permission denied' : 'Camera not available'}
+                  </p>
+                  {errorType === 'permission' ? (
+                    <p className="text-xs text-spark-text-muted">
+                      Please enable camera access in your device settings to scan QR codes.
+                    </p>
+                  ) : (
+                    <p className="text-xs text-spark-text-muted">{error}</p>
+                  )}
                 </div>
               </div>
             )}

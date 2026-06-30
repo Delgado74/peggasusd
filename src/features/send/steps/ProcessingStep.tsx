@@ -51,39 +51,33 @@ const ProcessingStep: React.FC<ProcessingStepProps> = ({ operationType = 'paymen
 
   return (
     <div className="flex flex-col items-center justify-center py-12">
-      {/* Animated Glow logo */}
+      {/* Animated PEGGASUSD logo with stars */}
       <div className="relative mb-8">
-        {/* Logo container with spinning ring */}
+        {/* Logo container with spinning stars */}
         <div className="relative w-24 h-24 flex items-center justify-center">
-          {/* Spinning ring */}
-          <span className="absolute inset-0 w-full h-full animate-spin" style={{ animationDuration: '3s' }}>
-            <svg className="w-full h-full" viewBox="0 0 100 100">
-              <circle
-                cx="50"
-                cy="50"
-                r="46"
-                fill="none"
-                stroke="url(#processing-gradient)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray="80 200"
-              />
-              <defs>
-                <linearGradient id="processing-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#d4a574" />
-                  <stop offset="100%" stopColor="#d4a574" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-            </svg>
+          {/* Spinning stars ring */}
+          <span className="absolute inset-0 w-full h-full animate-spin" style={{ animationDuration: '12s' }}>
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ top: '0', left: '50%', transform: 'translateX(-50%)' }} />
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ top: '20%', right: '5%' }} />
+            <div className="absolute w-1 h-1 bg-[#00C7B7] rounded-full shadow-[0_0_4px_#00C7B7]" style={{ right: '0', top: '45%' }} />
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ bottom: '20%', right: '5%' }} />
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ bottom: '0', left: '50%', transform: 'translateX(-50%)' }} />
+            <div className="absolute w-1 h-1 bg-[#00C7B7] rounded-full shadow-[0_0_4px_#00C7B7]" style={{ bottom: '20%', left: '5%' }} />
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ left: '0', top: '45%' }} />
+            <div className="absolute w-1 h-1 bg-[#F7931A] rounded-full shadow-[0_0_4px_#F7931A]" style={{ top: '20%', left: '5%' }} />
+          </span>
+
+          {/* Inner ring */}
+          <span className="absolute inset-2 w-auto h-auto animate-spin" style={{ animationDuration: '8s', animationDirection: 'reverse' }}>
+            <div className="w-full h-full rounded-full border border-[rgba(247,147,26,0.15)]" />
           </span>
 
           {/* Icon */}
           {isAuth ? renderIcon() : (
             <img
-              src="/assets/Glow_Logo.svg"
+              src="/assets/PEGGASUSD_Logo.png"
               alt="Processing"
-              className="w-14 h-14 object-contain animate-pulse drop-shadow-[0_0_15px_rgba(212,165,116,0.4)]"
-              style={{ animationDuration: '2s' }}
+              className="w-12 h-12 object-contain relative z-10"
             />
           )}
         </div>

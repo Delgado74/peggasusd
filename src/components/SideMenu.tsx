@@ -2,7 +2,7 @@ import React, { useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { Transition, TransitionChild } from '@headlessui/react';
 import { isPasskeyMode } from '@/services/passkeyService';
-import { RefundIcon, BackupIcon, SettingsIcon, LogoutIcon, CloseIcon, AlertTriangleIcon } from './Icons';
+import { RefundIcon, BackupIcon, SettingsIcon, LogoutIcon, CloseIcon, AlertTriangleIcon, InfoIcon } from './Icons';
 import { safeAreaTop, safeAreaBottom } from '../utils/safeAreaInsets';
 import { useStatusBarColor } from '../hooks/useStatusBarColor';
 import { STATUS_BAR_SURFACE, STATUS_BAR_DIALOG_SCRIM } from '../utils/statusBarManager';
@@ -49,12 +49,13 @@ interface SideMenuProps {
   onClose: () => void;
   onLogout: () => void;
   onOpenSettings: () => void;
+  onOpenAbout: () => void;
   onOpenBackup: () => void;
   onOpenRefund?: () => void;
   hasRejectedDeposits?: boolean;
 }
 
-const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSettings, onOpenBackup, onOpenRefund, hasRejectedDeposits = false }) => {
+const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSettings, onOpenAbout, onOpenBackup, onOpenRefund, hasRejectedDeposits = false }) => {
   // While the drawer is open, push the solid spark-surface tone over
   // the wallet page's glass tint so the status bar matches the drawer
   // panel's solid bg. Tied to isOpen so popping happens on close.
@@ -121,6 +122,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
       icon: <SettingsIcon />,
       label: t('settings'),
       onClick: () => closeDrawerThen(onOpenSettings)
+    },
+    {
+      icon: <InfoIcon />,
+      label: t('about'),
+      onClick: () => closeDrawerThen(onOpenAbout)
     },
     {
       icon: <LogoutIcon />,
