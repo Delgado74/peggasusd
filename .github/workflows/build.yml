@@ -34,7 +34,7 @@ jobs:
 
       - name: Add camera permission to AndroidManifest
         run: |
-          sed -i 's/<application/<uses-permission android:name="android.permission.CAMERA"\/>\n<application/' android/app/src/main/AndroidManifest.xml
+          sed -i 's/<application/<uses-permission android:name="android.permission.CAMERA"\/>\n<uses-feature android:name="android.hardware.camera" android:required="false"\/>\n<application/' android/app/src/main/AndroidManifest.xml
 
       - name: Build APK (debug)
         run: cd android && ./gradlew assembleDebug
