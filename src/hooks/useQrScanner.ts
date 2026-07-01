@@ -1,5 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
-import QrScanner from 'qr-scanner';
+// Use legacy build which inlines the worker — avoids dynamic import()
+// issues in Capacitor WebView on Android.
+import QrScanner from 'qr-scanner/qr-scanner.legacy.min.js';
 import { logger, LogCategory } from '@/services/logger';
 import { formatError } from '@/utils/formatError';
 

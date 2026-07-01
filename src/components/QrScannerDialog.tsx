@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
-import QrScanner from 'qr-scanner';
+import QrScanner from 'qr-scanner/qr-scanner.legacy.min.js';
 import { BottomSheetContainer, FloatingIconButton } from './ui';
 import { useQrScanner } from '../hooks/useQrScanner';
 import { logger, LogCategory } from '@/services/logger';
