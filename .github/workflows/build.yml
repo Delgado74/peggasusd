@@ -32,6 +32,10 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Add camera permission to AndroidManifest
+        run: |
+          sed -i 's/<application/<uses-permission android:name="android.permission.CAMERA"\/>\n<application/' android/app/src/main/AndroidManifest.xml
+
       - name: Build APK (debug)
         run: cd android && ./gradlew assembleDebug
 

@@ -67,6 +67,16 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
         return;
       }
 
+      // Trigger permission prompt via hasCamera so the browser asks
+      // the user before we try start(). If it fails (e.g. denied or
+      // WebView quirks), we still try start() below — the catch block
+      // handles the actual error.
+      try {
+        await QrScanner.hasCamera();
+      } catch {
+        // hasCamera can throw if getUserMedia fails — ignore, proceed
+      }
+
       qrScannerRef.current = new QrScanner(
         videoRef.current,
         (result) => {
@@ -115,6 +125,7 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
     } catch (err) {
       logger.error(LogCategory.UI, 'Failed to start QR scanner', {
         error: formatError(err),
+        errorName: err instanceof Error ? err.name : 'unknown',
       });
       let errorMessage = 'Camera access denied or not available';
       let eType: 'permission' | 'not-found' | 'in-use' | 'constraint' | 'generic' = 'generic';
@@ -132,6 +143,9 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
         } else if (err.name === 'OverconstrainedError') {
           errorMessage = 'Camera constraints not supported';
           eType = 'constraint';
+        } else {
+          errorMessage = `Camera error (${err.name}). Check device camera permissions.`;
+          eType = 'generic';
         }
       }
 
